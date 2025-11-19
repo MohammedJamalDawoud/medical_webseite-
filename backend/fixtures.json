@@ -1,0 +1,225 @@
+[
+    {
+        "model": "experiments.organoidsample",
+        "pk": 1,
+        "fields": {
+            "name": "Marmoset Organoid MO-001",
+            "species": "MARMOSET",
+            "description": "Primary marmoset brain organoid cultured for 90 days. Used for longitudinal MRI study.",
+            "date_created": "2024-01-15",
+            "notes": "Healthy development, suitable for multi-modal imaging"
+        }
+    },
+    {
+        "model": "experiments.organoidsample",
+        "pk": 2,
+        "fields": {
+            "name": "Human Organoid HO-002",
+            "species": "HUMAN",
+            "description": "Human iPSC-derived cerebral organoid, day 120. Model for cortical development.",
+            "date_created": "2024-02-20",
+            "notes": "Shows clear cortical layering in MRI"
+        }
+    },
+    {
+        "model": "experiments.mriscan",
+        "pk": 1,
+        "fields": {
+            "organoid": 1,
+            "modality": "T2W",
+            "sequence_name": "RARE T2-weighted",
+            "acquisition_date": "2024-03-01",
+            "resolution": "100 μm isotropic",
+            "field_strength": "9.4 T",
+            "notes": "High SNR, excellent tissue contrast"
+        }
+    },
+    {
+        "model": "experiments.mriscan",
+        "pk": 2,
+        "fields": {
+            "organoid": 1,
+            "modality": "DWI",
+            "sequence_name": "Diffusion-weighted imaging",
+            "acquisition_date": "2024-03-01",
+            "resolution": "150 μm isotropic",
+            "field_strength": "9.4 T",
+            "notes": "b-values: 0, 500, 1000 s/mm²"
+        }
+    },
+    {
+        "model": "experiments.mriscan",
+        "pk": 3,
+        "fields": {
+            "organoid": 2,
+            "modality": "MGE",
+            "sequence_name": "Multi-Gradient Echo",
+            "acquisition_date": "2024-03-15",
+            "resolution": "80 μm isotropic",
+            "field_strength": "9.4 T",
+            "notes": "Multiple echo times for T2* mapping"
+        }
+    },
+    {
+        "model": "experiments.processingstep",
+        "pk": 1,
+        "fields": {
+            "scan": 1,
+            "step_type": "N4_BIAS",
+            "status": "COMPLETED",
+            "parameters_json": {
+                "shrink_factor": 4,
+                "iterations": [
+                    50,
+                    50,
+                    50,
+                    50
+                ]
+            },
+            "output_path": "/data/processed/MO-001_T2W_n4corrected.nii.gz",
+            "log_excerpt": "N4 bias field correction completed successfully"
+        }
+    },
+    {
+        "model": "experiments.processingstep",
+        "pk": 2,
+        "fields": {
+            "scan": 1,
+            "step_type": "NORMALIZATION",
+            "status": "COMPLETED",
+            "parameters_json": {
+                "method": "z-score",
+                "mask_threshold": 0.1
+            },
+            "output_path": "/data/processed/MO-001_T2W_normalized.nii.gz",
+            "log_excerpt": "Intensity normalization: mean=0, std=1"
+        }
+    },
+    {
+        "model": "experiments.processingstep",
+        "pk": 3,
+        "fields": {
+            "scan": 1,
+            "step_type": "DENOISING",
+            "status": "COMPLETED",
+            "parameters_json": {
+                "method": "non-local means",
+                "patch_size": 3
+            },
+            "output_path": "/data/processed/MO-001_T2W_denoised.nii.gz",
+            "log_excerpt": "Denoising completed, SNR improved by 2.3x"
+        }
+    },
+    {
+        "model": "experiments.processingstep",
+        "pk": 4,
+        "fields": {
+            "scan": 1,
+            "step_type": "GMM_SEG",
+            "status": "COMPLETED",
+            "parameters_json": {
+                "n_components": 3,
+                "tissue_classes": [
+                    "CSF",
+                    "Gray Matter",
+                    "White Matter"
+                ]
+            },
+            "output_path": "/data/segmentation/MO-001_GMM_probmaps.nii.gz",
+            "log_excerpt": "GMM segmentation: 3 tissue classes identified"
+        }
+    },
+    {
+        "model": "experiments.processingstep",
+        "pk": 5,
+        "fields": {
+            "scan": 1,
+            "step_type": "UNET_SEG",
+            "status": "COMPLETED",
+            "parameters_json": {
+                "model": "UNet3D",
+                "epochs": 100,
+                "learning_rate": 0.001
+            },
+            "output_path": "/data/segmentation/MO-001_UNet_seg.nii.gz",
+            "log_excerpt": "U-Net training completed, validation Dice: 0.89"
+        }
+    },
+    {
+        "model": "experiments.processingstep",
+        "pk": 6,
+        "fields": {
+            "scan": 3,
+            "step_type": "N4_BIAS",
+            "status": "RUNNING",
+            "parameters_json": {
+                "shrink_factor": 4
+            },
+            "output_path": "",
+            "log_excerpt": "Processing echo 3 of 8..."
+        }
+    },
+    {
+        "model": "experiments.segmentationresult",
+        "pk": 1,
+        "fields": {
+            "processing_step": 4,
+            "method": "GMM",
+            "description": "Gaussian Mixture Model segmentation with 3 tissue probability maps",
+            "dice_score": 0.82,
+            "jaccard_index": 0.69,
+            "notes": "Good initial segmentation, used as prior for U-Net"
+        }
+    },
+    {
+        "model": "experiments.segmentationresult",
+        "pk": 2,
+        "fields": {
+            "processing_step": 5,
+            "method": "UNET",
+            "description": "U-Net refinement using GMM probability maps as additional input channels",
+            "dice_score": 0.91,
+            "jaccard_index": 0.84,
+            "notes": "Significant improvement over GMM alone, especially at tissue boundaries"
+        }
+    },
+    {
+        "model": "experiments.publicationorposter",
+        "pk": 1,
+        "fields": {
+            "title": "Automated Tissue Segmentation of In Vitro MRI Data Using Combined GMM and U-Net Approaches",
+            "pub_type": "THESIS",
+            "year": 2025,
+            "authors": "Your Name",
+            "venue": "HAWK Hochschule für angewandte Wissenschaft und Kunst, Göttingen",
+            "link": "",
+            "abstract": "This master thesis presents a novel pipeline combining Gaussian Mixture Models and deep learning for automated tissue segmentation of brain organoid MRI data acquired at ultra-high field (9.4T). The method achieves state-of-the-art performance on multimodal in vitro datasets."
+        }
+    },
+    {
+        "model": "experiments.publicationorposter",
+        "pk": 2,
+        "fields": {
+            "title": "Multimodal MRI of Brain Organoids: From Acquisition to Automated Segmentation",
+            "pub_type": "POSTER",
+            "year": 2024,
+            "authors": "Your Name, Prof. Dr. Roman Grothausmann, Prof. Dr. Susann Boretius",
+            "venue": "German Neuroscience Society Meeting, Göttingen",
+            "link": "",
+            "abstract": "Poster presenting preliminary results on automated segmentation of marmoset and human brain organoids using MRI at 9.4T."
+        }
+    },
+    {
+        "model": "experiments.publicationorposter",
+        "pk": 3,
+        "fields": {
+            "title": "Deep Learning for Organoid Image Analysis: Challenges and Opportunities",
+            "pub_type": "TALK",
+            "year": 2024,
+            "authors": "Your Name",
+            "venue": "DPZ Seminar Series, Deutsches Primatenzentrum",
+            "link": "",
+            "abstract": "Invited talk on the application of deep learning methods for analyzing 3D MRI data of brain organoids."
+        }
+    }
+]
