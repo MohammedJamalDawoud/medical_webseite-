@@ -1,4 +1,3 @@
-import React from 'react';
 import type { MRIScan } from '../types';
 import { Eye } from 'lucide-react';
 

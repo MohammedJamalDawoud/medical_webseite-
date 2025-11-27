@@ -1,4 +1,3 @@
-import React from 'react';
 import type { SegmentationResult } from '../types';
 import { BarChart2, FileText } from 'lucide-react';
 

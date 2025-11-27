@@ -1,4 +1,3 @@
-import React from 'react';
 import type { PublicationOrPoster } from '../types';
 import { BookOpen, Presentation, FileText, Mic } from 'lucide-react';
 

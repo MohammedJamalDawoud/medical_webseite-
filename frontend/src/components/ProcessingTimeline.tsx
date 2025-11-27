@@ -1,4 +1,3 @@
-import React from 'react';
 import type { ProcessingStep } from '../types';
 import { CheckCircle, Clock, AlertCircle, Circle } from 'lucide-react';
 

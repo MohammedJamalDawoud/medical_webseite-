@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getOrganoids } from '../api/organoids';
 import { getScans } from '../api/scans';
 import { getProcessingSteps } from '../api/processingSteps';

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getPublications } from '../api/publications';
 import type { PublicationOrPoster } from '../types';
 import PublicationList from '../components/PublicationList';

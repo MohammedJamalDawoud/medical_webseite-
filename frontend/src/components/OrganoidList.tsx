@@ -1,4 +1,3 @@
-import React from 'react';
 import type { OrganoidSample } from '../types';
 import { Calendar, Info } from 'lucide-react';
 
