@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import LoadingSpinner from './components/LoadingSpinner';
+import BackToTop from './components/BackToTop';
 
 // Lazy load pages
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -30,6 +31,7 @@ function App() {
           </Suspense>
         </main>
         <Footer />
+        <BackToTop />
       </div>
     </Router>
   );

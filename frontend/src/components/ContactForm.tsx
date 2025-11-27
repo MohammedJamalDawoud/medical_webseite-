@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { Send, CheckCircle, AlertCircle } from 'lucide-react';
+import { Send } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
 
 const ContactForm = () => {
+    const { addToast } = useToast();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         subject: '',
         message: ''
     });
-    const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
-    const [errorMessage, setErrorMessage] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -18,14 +19,15 @@ const ContactForm = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setStatus('submitting');
+        setIsSubmitting(true);
         try {
             await axios.post('http://localhost:8000/api/contact/', formData);
-            setStatus('success');
+            addToast('Message sent successfully!', 'success');
             setFormData({ name: '', email: '', subject: '', message: '' });
         } catch (error) {
-            setStatus('error');
-            setErrorMessage('Failed to send message. Please try again.');
+            addToast('Failed to send message. Please try again.', 'error');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -88,10 +90,10 @@ const ContactForm = () => {
 
                 <button
                     type="submit"
-                    disabled={status === 'submitting'}
+                    disabled={isSubmitting}
                     className="btn btn-primary w-full mt-2"
                 >
-                    {status === 'submitting' ? (
+                    {isSubmitting ? (
                         'Sending...'
                     ) : (
                         <>
@@ -99,17 +101,6 @@ const ContactForm = () => {
                         </>
                     )}
                 </button>
-
-                {status === 'success' && (
-                    <div className="flex items-center text-success mt-2 justify-center animate-fade-in">
-                        <CheckCircle className="w-4 h-4 mr-2" /> Message sent successfully!
-                    </div>
-                )}
-                {status === 'error' && (
-                    <div className="flex items-center text-error mt-2 justify-center animate-fade-in">
-                        <AlertCircle className="w-4 h-4 mr-2" /> {errorMessage}
-                    </div>
-                )}
             </form>
         </div>
     );
