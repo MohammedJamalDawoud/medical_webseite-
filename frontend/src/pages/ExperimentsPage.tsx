@@ -8,8 +8,9 @@ import OrganoidList from '../components/OrganoidList';
 import ScanTable from '../components/ScanTable';
 import ProcessingTimeline from '../components/ProcessingTimeline';
 import SegmentationCard from '../components/SegmentationCard';
-import { AlertCircle, Loader } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import SEO from '../components/SEO';
+import Skeleton from '../components/Skeleton';
 
 const ExperimentsPage = () => {
     const [organoids, setOrganoids] = useState<OrganoidSample[]>([]);
@@ -21,6 +22,9 @@ const ExperimentsPage = () => {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
 
     useEffect(() => {
         const fetchOrganoids = async () => {
@@ -41,6 +45,16 @@ const ExperimentsPage = () => {
 
         fetchOrganoids();
     }, []);
+
+    // Pagination logic
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentOrganoids = organoids.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(organoids.length / itemsPerPage);
+
+    const handlePageChange = (pageNumber: number) => {
+        setCurrentPage(pageNumber);
+    };
 
     useEffect(() => {
         if (selectedOrganoid) {
@@ -83,8 +97,27 @@ const ExperimentsPage = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-64">
-                <Loader className="h-8 w-8 text-primary animate-spin" />
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="mb-8">
+                    <Skeleton height={40} width={300} className="mb-8" />
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-1">
+                        <div className="bg-white shadow rounded-lg p-6 space-y-4">
+                            <Skeleton height={24} width={150} />
+                            <div className="space-y-2">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                    <Skeleton key={i} height={48} />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="lg:col-span-2">
+                        <div className="bg-white shadow rounded-lg p-6 h-96">
+                            <Skeleton height="100%" />
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -119,10 +152,38 @@ const ExperimentsPage = () => {
                     {/* Left Column: Organoid List */}
                     <div className="lg:col-span-1">
                         <OrganoidList
-                            organoids={organoids}
+                            organoids={currentOrganoids}
                             onSelect={setSelectedOrganoid}
                             selectedId={selectedOrganoid?.id}
                         />
+                        {/* Pagination Controls */}
+                        {totalPages > 1 && (
+                            <div className="flex justify-between items-center mt-4 px-2">
+                                <button
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className={`px-3 py-1 rounded-md text-sm font-medium ${currentPage === 1
+                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                                        }`}
+                                >
+                                    Previous
+                                </button>
+                                <span className="text-sm text-gray-600">
+                                    Page {currentPage} of {totalPages}
+                                </span>
+                                <button
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                    className={`px-3 py-1 rounded-md text-sm font-medium ${currentPage === totalPages
+                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                                        }`}
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {/* Right Column: Details */}

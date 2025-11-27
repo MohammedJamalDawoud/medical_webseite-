@@ -11,6 +11,11 @@ The application serves as a platform to visualize and manage MRI data of brain o
 - **Processing Pipeline**: Visualization of the automated segmentation workflow (Preprocessing -> GMM -> U-Net).
 - **Results**: Interactive display of segmentation metrics (Dice Score, Jaccard Index).
 - **Publications**: Repository of related scientific outputs.
+- **Enhanced UI/UX**:
+  - Dark Mode support with persistent preference.
+  - SEO optimization with meta tags and titles.
+  - Responsive design with glassmorphism aesthetics.
+  - Pagination and loading skeletons for better performance.
 
 ## Tech Stack
 - **Backend**: Django (Python), Django REST Framework, SQLite/PostgreSQL.
