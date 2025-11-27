@@ -1,5 +1,5 @@
 import React from 'react';
-import { PublicationOrPoster } from '../types';
+import type { PublicationOrPoster } from '../types';
 import { BookOpen, Presentation, FileText, Mic } from 'lucide-react';
 
 interface PublicationListProps {
@@ -63,9 +63,9 @@ const PublicationList: React.FC<PublicationListProps> = ({ publications }) => {
                             </div>
                             <div className="ml-4 flex-shrink-0">
                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${pub.pub_type === 'THESIS' ? 'bg-purple-100 text-purple-800' :
-                                        pub.pub_type === 'PAPER' ? 'bg-blue-100 text-blue-800' :
-                                            pub.pub_type === 'POSTER' ? 'bg-green-100 text-green-800' :
-                                                'bg-gray-100 text-gray-800'
+                                    pub.pub_type === 'PAPER' ? 'bg-blue-100 text-blue-800' :
+                                        pub.pub_type === 'POSTER' ? 'bg-green-100 text-green-800' :
+                                            'bg-gray-100 text-gray-800'
                                     }`}>
                                     {pub.pub_type}
                                 </span>

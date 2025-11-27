@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getPublications } from '../api/publications';
-import { PublicationOrPoster } from '../types';
+import type { PublicationOrPoster } from '../types';
 import PublicationList from '../components/PublicationList';
 import { Loader, AlertCircle } from 'lucide-react';
 

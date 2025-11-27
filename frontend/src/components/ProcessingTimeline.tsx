@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProcessingStep } from '../types';
+import type { ProcessingStep } from '../types';
 import { CheckCircle, Clock, AlertCircle, Circle } from 'lucide-react';
 
 interface ProcessingTimelineProps {

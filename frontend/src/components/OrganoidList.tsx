@@ -1,5 +1,5 @@
 import React from 'react';
-import { OrganoidSample } from '../types';
+import type { OrganoidSample } from '../types';
 import { Calendar, Info } from 'lucide-react';
 
 interface OrganoidListProps {
@@ -18,8 +18,8 @@ const OrganoidList: React.FC<OrganoidListProps> = ({ organoids, onSelect, select
                         key={organoid.id}
                         onClick={() => onSelect(organoid)}
                         className={`p-4 rounded-lg border cursor-pointer transition-colors ${selectedId === organoid.id
-                                ? 'border-primary bg-teal-50'
-                                : 'border-gray-200 hover:border-primary hover:bg-gray-50'
+                            ? 'border-primary bg-teal-50'
+                            : 'border-gray-200 hover:border-primary hover:bg-gray-50'
                             }`}
                     >
                         <div className="flex justify-between items-start">

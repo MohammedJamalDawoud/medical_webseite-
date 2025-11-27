@@ -1,5 +1,5 @@
 import React from 'react';
-import { MRIScan } from '../types';
+import type { MRIScan } from '../types';
 import { Eye } from 'lucide-react';
 
 interface ScanTableProps {

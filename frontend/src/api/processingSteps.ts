@@ -1,5 +1,5 @@
 import client from './client';
-import { ProcessingStep } from '../types';
+import type { ProcessingStep } from '../types';
 
 export const getProcessingSteps = async (scanId?: number) => {
     const params = scanId ? { scan: scanId } : {};

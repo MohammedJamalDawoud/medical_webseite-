@@ -3,7 +3,7 @@ import { getOrganoids } from '../api/organoids';
 import { getScans } from '../api/scans';
 import { getProcessingSteps } from '../api/processingSteps';
 import { getSegmentationResults } from '../api/segmentations';
-import { OrganoidSample, MRIScan, ProcessingStep, SegmentationResult } from '../types';
+import type { OrganoidSample, MRIScan, ProcessingStep, SegmentationResult } from '../types';
 import OrganoidList from '../components/OrganoidList';
 import ScanTable from '../components/ScanTable';
 import ProcessingTimeline from '../components/ProcessingTimeline';

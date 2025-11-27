@@ -1,5 +1,5 @@
 import React from 'react';
-import { SegmentationResult } from '../types';
+import type { SegmentationResult } from '../types';
 import { BarChart2, FileText } from 'lucide-react';
 
 interface SegmentationCardProps {

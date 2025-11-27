@@ -1,5 +1,5 @@
 import client from './client';
-import { MRIScan } from '../types';
+import type { MRIScan } from '../types';
 
 export const getScans = async (organoidId?: number) => {
     const params = organoidId ? { organoid: organoidId } : {};

@@ -1,8 +1,8 @@
 import client from './client';
-import { OrganoidSample } from '../types';
+import type { OrganoidSample } from '../types';
 
 export const getOrganoids = async () => {
-    constresponse = await client.get<{ results: OrganoidSample[] }>('/organoids/');
+    const response = await client.get<{ results: OrganoidSample[] }>('/organoids/');
     return response.data.results;
 };
 
