@@ -3,6 +3,7 @@ import { getPublications } from '../api/publications';
 import type { PublicationOrPoster } from '../types';
 import PublicationList from '../components/PublicationList';
 import { Loader, AlertCircle } from 'lucide-react';
+import SEO from '../components/SEO';
 
 const PublicationsPage = () => {
     const [publications, setPublications] = useState<PublicationOrPoster[]>([]);
@@ -56,44 +57,50 @@ const PublicationsPage = () => {
     const talks = publications.filter(p => p.pub_type === 'TALK');
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="text-center mb-12">
-                <h1 className="text-3xl font-bold text-gray-900">Scientific Output</h1>
-                <p className="mt-4 text-xl text-gray-500">
-                    Publications, posters, and presentations related to the project.
-                </p>
+        <>
+            <SEO
+                title="Publications"
+                description="List of publications, posters, and talks related to the MRI organoid segmentation project."
+            />
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div className="text-center mb-12">
+                    <h1 className="text-3xl font-bold text-gray-900">Scientific Output</h1>
+                    <p className="mt-4 text-xl text-gray-500">
+                        Publications, posters, and presentations related to the project.
+                    </p>
+                </div>
+
+                <div className="space-y-12">
+                    {theses.length > 0 && (
+                        <section>
+                            <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b pb-2">Theses</h2>
+                            <PublicationList publications={theses} />
+                        </section>
+                    )}
+
+                    {papers.length > 0 && (
+                        <section>
+                            <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b pb-2">Papers</h2>
+                            <PublicationList publications={papers} />
+                        </section>
+                    )}
+
+                    {posters.length > 0 && (
+                        <section>
+                            <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b pb-2">Posters</h2>
+                            <PublicationList publications={posters} />
+                        </section>
+                    )}
+
+                    {talks.length > 0 && (
+                        <section>
+                            <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b pb-2">Talks</h2>
+                            <PublicationList publications={talks} />
+                        </section>
+                    )}
+                </div>
             </div>
-
-            <div className="space-y-12">
-                {theses.length > 0 && (
-                    <section>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b pb-2">Theses</h2>
-                        <PublicationList publications={theses} />
-                    </section>
-                )}
-
-                {papers.length > 0 && (
-                    <section>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b pb-2">Papers</h2>
-                        <PublicationList publications={papers} />
-                    </section>
-                )}
-
-                {posters.length > 0 && (
-                    <section>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b pb-2">Posters</h2>
-                        <PublicationList publications={posters} />
-                    </section>
-                )}
-
-                {talks.length > 0 && (
-                    <section>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b pb-2">Talks</h2>
-                        <PublicationList publications={talks} />
-                    </section>
-                )}
-            </div>
-        </div>
+        </>
     );
 };
 

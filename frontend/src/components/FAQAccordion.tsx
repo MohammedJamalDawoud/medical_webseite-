@@ -43,6 +43,8 @@ const FAQAccordion = () => {
                     <button
                         className="w-full px-6 py-4 flex justify-between items-center text-left focus:outline-none"
                         onClick={() => toggleFAQ(faq.id)}
+                        aria-expanded={openId === faq.id}
+                        aria-controls={`faq-answer-${faq.id}`}
                     >
                         <span className="font-medium text-lg">{faq.question}</span>
                         {openId === faq.id ? (
@@ -52,9 +54,12 @@ const FAQAccordion = () => {
                         )}
                     </button>
                     <div
+                        id={`faq-answer-${faq.id}`}
                         className={`px-6 transition-all duration-300 ease-in-out ${openId === faq.id ? 'max-h-96 py-4 opacity-100' : 'max-h-0 py-0 opacity-0'
                             }`}
                         style={{ borderTop: openId === faq.id ? '1px solid var(--border)' : 'none' }}
+                        role="region"
+                        aria-labelledby={`faq-question-${faq.id}`}
                     >
                         <p className="text-muted">{faq.answer}</p>
                     </div>

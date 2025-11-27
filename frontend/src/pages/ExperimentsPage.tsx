@@ -9,6 +9,7 @@ import ScanTable from '../components/ScanTable';
 import ProcessingTimeline from '../components/ProcessingTimeline';
 import SegmentationCard from '../components/SegmentationCard';
 import { AlertCircle, Loader } from 'lucide-react';
+import SEO from '../components/SEO';
 
 const ExperimentsPage = () => {
     const [organoids, setOrganoids] = useState<OrganoidSample[]>([]);
@@ -106,67 +107,73 @@ const ExperimentsPage = () => {
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">Experiments & Data</h1>
+        <>
+            <SEO
+                title="Experiments"
+                description="Explore MRI scans, processing steps, and segmentation results for various brain organoid samples."
+            />
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-8">Experiments & Data</h1>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Left Column: Organoid List */}
-                <div className="lg:col-span-1">
-                    <OrganoidList
-                        organoids={organoids}
-                        onSelect={setSelectedOrganoid}
-                        selectedId={selectedOrganoid?.id}
-                    />
-                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Left Column: Organoid List */}
+                    <div className="lg:col-span-1">
+                        <OrganoidList
+                            organoids={organoids}
+                            onSelect={setSelectedOrganoid}
+                            selectedId={selectedOrganoid?.id}
+                        />
+                    </div>
 
-                {/* Right Column: Details */}
-                <div className="lg:col-span-2 space-y-8">
-                    {!selectedOrganoid ? (
-                        <div className="bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
-                            <p className="text-gray-500">Select an organoid sample from the list to view its MRI scans.</p>
-                        </div>
-                    ) : (
-                        <>
-                            <div className="bg-white shadow rounded-lg p-6">
-                                <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                                    MRI Scans: {selectedOrganoid.name}
-                                </h2>
-                                <ScanTable scans={scans} onSelect={setSelectedScan} />
+                    {/* Right Column: Details */}
+                    <div className="lg:col-span-2 space-y-8">
+                        {!selectedOrganoid ? (
+                            <div className="bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
+                                <p className="text-gray-500">Select an organoid sample from the list to view its MRI scans.</p>
                             </div>
-
-                            {selectedScan && (
-                                <div className="bg-white shadow rounded-lg p-6 animate-fade-in">
+                        ) : (
+                            <>
+                                <div className="bg-white shadow rounded-lg p-6">
                                     <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                                        Processing Pipeline: {selectedScan.sequence_name}
+                                        MRI Scans: {selectedOrganoid.name}
                                     </h2>
+                                    <ScanTable scans={scans} onSelect={setSelectedScan} />
+                                </div>
 
-                                    <div className="mb-8">
-                                        <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Pipeline Steps</h3>
-                                        <ProcessingTimeline steps={processingSteps} />
-                                    </div>
+                                {selectedScan && (
+                                    <div className="bg-white shadow rounded-lg p-6 animate-fade-in">
+                                        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                                            Processing Pipeline: {selectedScan.sequence_name}
+                                        </h2>
 
-                                    <div>
-                                        <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Segmentation Results</h3>
-                                        <div className="grid gap-6">
-                                            {processingSteps
-                                                .filter(step => step.has_segmentation)
-                                                .map(step => {
-                                                    const result = getSegmentationForStep(step.id);
-                                                    return result ? <SegmentationCard key={result.id} result={result} /> : null;
-                                                })
-                                            }
-                                            {processingSteps.filter(step => step.has_segmentation).length === 0 && (
-                                                <p className="text-sm text-gray-500 italic">No segmentation results available yet.</p>
-                                            )}
+                                        <div className="mb-8">
+                                            <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Pipeline Steps</h3>
+                                            <ProcessingTimeline steps={processingSteps} />
+                                        </div>
+
+                                        <div>
+                                            <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Segmentation Results</h3>
+                                            <div className="grid gap-6">
+                                                {processingSteps
+                                                    .filter(step => step.has_segmentation)
+                                                    .map(step => {
+                                                        const result = getSegmentationForStep(step.id);
+                                                        return result ? <SegmentationCard key={result.id} result={result} /> : null;
+                                                    })
+                                                }
+                                                {processingSteps.filter(step => step.has_segmentation).length === 0 && (
+                                                    <p className="text-sm text-gray-500 italic">No segmentation results available yet.</p>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            )}
-                        </>
-                    )}
+                                )}
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 
