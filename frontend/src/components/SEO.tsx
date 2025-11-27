@@ -40,6 +40,21 @@ const SEO = ({
             <meta property="twitter:title" content={fullTitle} />
             <meta property="twitter:description" content={description} />
             <meta property="twitter:image" content={ogImage} />
+
+            {/* Structured Data (JSON-LD) */}
+            <script type="application/ld+json">
+                {JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "WebSite",
+                    "name": siteTitle,
+                    "url": "https://example.com", // Replace with actual URL
+                    "description": description,
+                    "author": {
+                        "@type": "Person",
+                        "name": author
+                    }
+                })}
+            </script>
         </Helmet>
     );
 };
