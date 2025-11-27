@@ -1,14 +1,15 @@
 from rest_framework import serializers
-from .models import OrganoidSample, MRIScan, ProcessingStep, SegmentationResult, PublicationOrPoster
+from .models import Organoid, MRIScan, PipelineRun, SegmentationResult, Metric
 
 
-class OrganoidSampleSerializer(serializers.ModelSerializer):
-    """Serializer for OrganoidSample model."""
+class OrganoidSerializer(serializers.ModelSerializer):
+    """Serializer for Organoid model."""
     scans_count = serializers.SerializerMethodField()
     
     class Meta:
-        model = OrganoidSample
-        fields = ['id', 'name', 'species', 'description', 'date_created', 'notes', 'scans_count']
+        model = Organoid
+        fields = ['id', 'name', 'species', 'experiment_id', 'description', 'created_at', 'notes', 'scans_count']
+        read_only_fields = ['id', 'created_at']
     
     def get_scans_count(self, obj):
         return obj.scans.count()
@@ -17,67 +18,72 @@ class OrganoidSampleSerializer(serializers.ModelSerializer):
 class MRIScanSerializer(serializers.ModelSerializer):
     """Serializer for MRIScan model."""
     organoid_name = serializers.CharField(source='organoid.name', read_only=True)
-    processing_steps_count = serializers.SerializerMethodField()
+    pipeline_runs_count = serializers.SerializerMethodField()
     
     class Meta:
         model = MRIScan
         fields = [
-            'id', 'organoid', 'organoid_name', 'modality', 'sequence_name',
-            'acquisition_date', 'resolution', 'field_strength', 'notes',
-            'processing_steps_count'
+            'id', 'organoid', 'organoid_name', 'sequence_type',
+            'acquisition_date', 'resolution', 'file_path', 'notes',
+            'created_at', 'pipeline_runs_count'
         ]
+        read_only_fields = ['id', 'created_at']
     
-    def get_processing_steps_count(self, obj):
-        return obj.processing_steps.count()
+    def get_pipeline_runs_count(self, obj):
+        return obj.pipeline_runs.count()
 
 
-class ProcessingStepSerializer(serializers.ModelSerializer):
-    """Serializer for ProcessingStep model."""
+class PipelineRunSerializer(serializers.ModelSerializer):
+    """Serializer for PipelineRun model."""
     scan_info = serializers.SerializerMethodField()
-    has_segmentation = serializers.SerializerMethodField()
+    has_result = serializers.SerializerMethodField()
     
     class Meta:
-        model = ProcessingStep
+        model = PipelineRun
         fields = [
-            'id', 'scan', 'scan_info', 'step_type', 'status',
-            'created_at', 'updated_at', 'parameters_json',
-            'output_path', 'log_excerpt', 'has_segmentation'
+            'id', 'mri_scan', 'scan_info', 'stage', 'status',
+            'started_at', 'finished_at', 'log_excerpt', 'config_json',
+            'docker_image', 'cli_command', 'created_at', 'has_result'
         ]
+        read_only_fields = ['id', 'created_at']
     
     def get_scan_info(self, obj):
         return {
-            'id': obj.scan.id,
-            'organoid_name': obj.scan.organoid.name,
-            'modality': obj.scan.modality
+            'id': str(obj.mri_scan.id),
+            'organoid_name': obj.mri_scan.organoid.name,
+            'sequence_type': obj.mri_scan.sequence_type
         }
     
-    def get_has_segmentation(self, obj):
-        return hasattr(obj, 'segmentation')
+    def get_has_result(self, obj):
+        return hasattr(obj, 'segmentation_result')
+
+
+class MetricSerializer(serializers.ModelSerializer):
+    """Serializer for Metric model."""
+    
+    class Meta:
+        model = Metric
+        fields = ['id', 'segmentation_result', 'metric_name', 'metric_value', 'unit', 'created_at']
+        read_only_fields = ['id', 'created_at']
 
 
 class SegmentationResultSerializer(serializers.ModelSerializer):
     """Serializer for SegmentationResult model."""
-    processing_step_info = serializers.SerializerMethodField()
+    pipeline_run_info = serializers.SerializerMethodField()
+    metrics = MetricSerializer(many=True, read_only=True)
     
     class Meta:
         model = SegmentationResult
         fields = [
-            'id', 'processing_step', 'processing_step_info', 'method',
-            'description', 'created_at', 'dice_score', 'jaccard_index', 'notes'
+            'id', 'pipeline_run', 'pipeline_run_info', 'mask_path',
+            'preview_image_path', 'model_version', 'created_at', 'metrics'
         ]
+        read_only_fields = ['id', 'created_at']
     
-    def get_processing_step_info(self, obj):
+    def get_pipeline_run_info(self, obj):
         return {
-            'id': obj.processing_step.id,
-            'step_type': obj.processing_step.step_type,
-            'organoid_name': obj.processing_step.scan.organoid.name,
-            'scan_modality': obj.processing_step.scan.modality
+            'id': str(obj.pipeline_run.id),
+            'stage': obj.pipeline_run.stage,
+            'organoid_name': obj.pipeline_run.mri_scan.organoid.name,
+            'sequence_type': obj.pipeline_run.mri_scan.sequence_type
         }
-
-
-class PublicationOrPosterSerializer(serializers.ModelSerializer):
-    """Serializer for PublicationOrPoster model."""
-    
-    class Meta:
-        model = PublicationOrPoster
-        fields = ['id', 'title', 'pub_type', 'year', 'authors', 'venue', 'link', 'abstract']

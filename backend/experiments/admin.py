@@ -1,43 +1,47 @@
 from django.contrib import admin
 from experiments.models import (
-    OrganoidSample,
+    Organoid,
     MRIScan,
-    ProcessingStep,
+    PipelineRun,
     SegmentationResult,
-    PublicationOrPoster
+    Metric
 )
 
 
-@admin.register(OrganoidSample)
-class OrganoidSampleAdmin(admin.ModelAdmin):
-    list_display = ['name', 'species', 'date_created']
+@admin.register(Organoid)
+class OrganoidAdmin(admin.ModelAdmin):
+    list_display = ['name', 'species', 'experiment_id', 'created_at']
     list_filter = ['species']
-    search_fields = ['name', 'description']
+    search_fields = ['name', 'description', 'experiment_id']
+    readonly_fields = ['id', 'created_at']
 
 
 @admin.register(MRIScan)
 class MRIScanAdmin(admin.ModelAdmin):
-    list_display = ['organoid', 'modality', 'sequence_name', 'acquisition_date', 'field_strength']
-    list_filter = ['modality', 'field_strength']
-    search_fields = ['organoid__name', 'sequence_name']
+    list_display = ['organoid', 'sequence_type', 'acquisition_date', 'resolution']
+    list_filter = ['sequence_type']
+    search_fields = ['organoid__name', 'file_path']
+    readonly_fields = ['id', 'created_at']
 
 
-@admin.register(ProcessingStep)
-class ProcessingStepAdmin(admin.ModelAdmin):
-    list_display = ['scan', 'step_type', 'status', 'created_at', 'updated_at']
-    list_filter = ['step_type', 'status']
-    search_fields = ['scan__organoid__name']
+@admin.register(PipelineRun)
+class PipelineRunAdmin(admin.ModelAdmin):
+    list_display = ['mri_scan', 'stage', 'status', 'started_at', 'finished_at']
+    list_filter = ['stage', 'status']
+    search_fields = ['mri_scan__organoid__name']
+    readonly_fields = ['id', 'created_at']
 
 
 @admin.register(SegmentationResult)
 class SegmentationResultAdmin(admin.ModelAdmin):
-    list_display = ['processing_step', 'method', 'dice_score', 'jaccard_index', 'created_at']
-    list_filter = ['method']
-    search_fields = ['processing_step__scan__organoid__name']
+    list_display = ['pipeline_run', 'model_version', 'created_at']
+    search_fields = ['pipeline_run__mri_scan__organoid__name']
+    readonly_fields = ['id', 'created_at']
 
 
-@admin.register(PublicationOrPoster)
-class PublicationOrPosterAdmin(admin.ModelAdmin):
-    list_display = ['title', 'pub_type', 'year', 'venue']
-    list_filter = ['pub_type', 'year']
-    search_fields = ['title', 'authors', 'venue']
+@admin.register(Metric)
+class MetricAdmin(admin.ModelAdmin):
+    list_display = ['segmentation_result', 'metric_name', 'metric_value', 'unit', 'created_at']
+    list_filter = ['metric_name']
+    search_fields = ['segmentation_result__pipeline_run__mri_scan__organoid__name']
+    readonly_fields = ['id', 'created_at']
