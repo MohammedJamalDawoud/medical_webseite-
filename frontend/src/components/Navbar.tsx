@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Activity, Brain, FileText, Home, Layers } from 'lucide-react';
+import DarkModeToggle from './DarkModeToggle';
 
 const Navbar = () => {
     return (
@@ -33,6 +34,9 @@ const Navbar = () => {
                                 About
                             </Link>
                         </div>
+                    </div>
+                    <div className="flex items-center">
+                        <DarkModeToggle />
                     </div>
                 </div>
             </div>
