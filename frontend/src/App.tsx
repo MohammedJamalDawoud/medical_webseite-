@@ -1,12 +1,16 @@
+import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import HomePage from './pages/HomePage';
-import ProjectOverviewPage from './pages/ProjectOverviewPage';
-import PipelinePage from './pages/PipelinePage';
-import ExperimentsPage from './pages/ExperimentsPage';
-import PublicationsPage from './pages/PublicationsPage';
-import AboutPage from './pages/AboutPage';
+import LoadingSpinner from './components/LoadingSpinner';
+
+// Lazy load pages
+const HomePage = lazy(() => import('./pages/HomePage'));
+const ProjectOverviewPage = lazy(() => import('./pages/ProjectOverviewPage'));
+const PipelinePage = lazy(() => import('./pages/PipelinePage'));
+const ExperimentsPage = lazy(() => import('./pages/ExperimentsPage'));
+const PublicationsPage = lazy(() => import('./pages/PublicationsPage'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
 
 function App() {
   return (
@@ -14,14 +18,16 @@ function App() {
       <div className="flex flex-col min-h-screen">
         <Navbar />
         <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/project" element={<ProjectOverviewPage />} />
-            <Route path="/pipeline" element={<PipelinePage />} />
-            <Route path="/experiments" element={<ExperimentsPage />} />
-            <Route path="/publications" element={<PublicationsPage />} />
-            <Route path="/about" element={<AboutPage />} />
-          </Routes>
+          <Suspense fallback={<LoadingSpinner />}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/project" element={<ProjectOverviewPage />} />
+              <Route path="/pipeline" element={<PipelinePage />} />
+              <Route path="/experiments" element={<ExperimentsPage />} />
+              <Route path="/publications" element={<PublicationsPage />} />
+              <Route path="/about" element={<AboutPage />} />
+            </Routes>
+          </Suspense>
         </main>
         <Footer />
       </div>
