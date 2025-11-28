@@ -27,6 +27,9 @@ const Navbar = () => {
                             <Link to="/experiments" className="text-muted hover-text-primary px-1 py-2 text-sm font-medium transition-colors">
                                 <Activity className="h-4 w-4 mr-1 inline" /> Experiments
                             </Link>
+                            <Link to="/organoids" className="text-muted hover-text-primary px-1 py-2 text-sm font-medium transition-colors">
+                                <Brain className="h-4 w-4 mr-1 inline" /> Organoids
+                            </Link>
                             <Link to="/publications" className="text-muted hover-text-primary px-1 py-2 text-sm font-medium transition-colors">
                                 <FileText className="h-4 w-4 mr-1 inline" /> Publications
                             </Link>

@@ -12,6 +12,10 @@ const PipelinePage = lazy(() => import('./pages/PipelinePage'));
 const ExperimentsPage = lazy(() => import('./pages/ExperimentsPage'));
 const PublicationsPage = lazy(() => import('./pages/PublicationsPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
+const OrganoidsPage = lazy(() => import('./pages/OrganoidsPage'));
+const OrganoidDetailPage = lazy(() => import('./pages/OrganoidDetailPage'));
+const PipelineRunsPage = lazy(() => import('./pages/PipelineRunsPage'));
+const SegmentationResultsPage = lazy(() => import('./pages/SegmentationResultsPage'));
 
 function App() {
   return (
@@ -27,6 +31,10 @@ function App() {
               <Route path="/experiments" element={<ExperimentsPage />} />
               <Route path="/publications" element={<PublicationsPage />} />
               <Route path="/about" element={<AboutPage />} />
+              <Route path="/organoids" element={<OrganoidsPage />} />
+              <Route path="/organoids/:id" element={<OrganoidDetailPage />} />
+              <Route path="/scans/:scanId/runs" element={<PipelineRunsPage />} />
+              <Route path="/pipeline-runs/:runId/results" element={<SegmentationResultsPage />} />
             </Routes>
           </Suspense>
         </main>
