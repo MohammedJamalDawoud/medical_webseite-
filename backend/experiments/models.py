@@ -1,6 +1,42 @@
 from django.db import models
 import uuid
 
+
+class ExperimentConfig(models.Model):
+    """
+    Stores pipeline configuration parameters for reproducible experiments.
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=200, help_text="Configuration name (e.g., 'GMM_3components')")
+    description = models.TextField(blank=True, help_text="Purpose and details of this configuration")
+    config_json = models.JSONField(default=dict, help_text="Pipeline parameters as JSON")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        ordering = ['-created_at']
+
+
+class ModelVersion(models.Model):
+    """
+    Tracks trained model versions for reproducibility.
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=200, help_text="Model version name (e.g., 'UNet_v2.1')")
+    description = models.TextField(blank=True, help_text="Training details, architecture notes")
+    weights_path = models.CharField(max_length=500, help_text="Path to model weights file")
+    training_dataset_description = models.TextField(blank=True, help_text="Description of training dataset")
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        ordering = ['-created_at']
+
 class Organoid(models.Model):
     """
     Represents a brain organoid sample used in MRI experiments.
@@ -82,6 +118,22 @@ class PipelineRun(models.Model):
     finished_at = models.DateTimeField(null=True, blank=True)
     log_excerpt = models.TextField(blank=True)
     config_json = models.JSONField(null=True, blank=True, help_text="Configuration parameters")
+    experiment_config = models.ForeignKey(
+        ExperimentConfig, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='pipeline_runs',
+        help_text="Experiment configuration used"
+    )
+    model_version = models.ForeignKey(
+        ModelVersion,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='pipeline_runs',
+        help_text="Model version used (for U-Net stage)"
+    )
     docker_image = models.CharField(max_length=200, blank=True, help_text="Docker image used")
     cli_command = models.TextField(blank=True, help_text="Command executed")
     created_at = models.DateTimeField(auto_now_add=True)

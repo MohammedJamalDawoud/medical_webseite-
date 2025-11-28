@@ -1,13 +1,41 @@
 from rest_framework import viewsets, filters
 from rest_framework.permissions import AllowAny
-from .models import Organoid, MRIScan, PipelineRun, SegmentationResult, Metric
+from .models import Organoid, MRIScan, PipelineRun, SegmentationResult, Metric, ExperimentConfig, ModelVersion
 from .serializers import (
     OrganoidSerializer,
     MRIScanSerializer,
     PipelineRunSerializer,
     SegmentationResultSerializer,
-    MetricSerializer
+    MetricSerializer,
+    ExperimentConfigSerializer,
+    ModelVersionSerializer
 )
+
+
+class ExperimentConfigViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing experiment configurations.
+    Stores reusable pipeline parameter sets.
+    """
+    queryset = ExperimentConfig.objects.all()
+    serializer_class = ExperimentConfigSerializer
+    permission_classes = [AllowAny]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name', 'description']
+    ordering_fields = ['created_at', 'updated_at', 'name']
+
+
+class ModelVersionViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing model versions.
+    Tracks trained model weights and metadata.
+    """
+    queryset = ModelVersion.objects.all()
+    serializer_class = ModelVersionSerializer
+    permission_classes = [AllowAny]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name', 'description', 'training_dataset_description']
+    ordering_fields = ['created_at', 'name']
 
 
 class OrganoidViewSet(viewsets.ModelViewSet):
@@ -70,12 +98,19 @@ class PipelineRunViewSet(viewsets.ModelViewSet):
         mri_scan = self.request.query_params.get('mri_scan', None)
         stage = self.request.query_params.get('stage', None)
         status = self.request.query_params.get('status', None)
+        experiment_config = self.request.query_params.get('experiment_config', None)
+        model_version = self.request.query_params.get('model_version', None)
+        
         if mri_scan:
             queryset = queryset.filter(mri_scan=mri_scan)
         if stage:
             queryset = queryset.filter(stage=stage)
         if status:
             queryset = queryset.filter(status=status)
+        if experiment_config:
+            queryset = queryset.filter(experiment_config=experiment_config)
+        if model_version:
+            queryset = queryset.filter(model_version=model_version)
         return queryset
 
 
