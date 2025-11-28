@@ -1,4 +1,7 @@
+import { GraduationCap, Building2, Users } from 'lucide-react';
 import SEO from '../components/SEO';
+import PageHeader from '../components/PageHeader';
+import Section from '../components/Section';
 
 const AboutPage = () => {
     return (
@@ -7,54 +10,159 @@ const AboutPage = () => {
                 title="About"
                 description="Master's thesis project on combined GMM and U-Net pipeline for multimodal tissue segmentation of in vitro MRI data."
             />
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <h1 className="text-3xl font-bold text-gray-900 mb-8">About the Project</h1>
+            <div className="page-container">
+                <PageHeader
+                    title="About the Project"
+                    subtitle="Master's Thesis in Medical Image Analysis"
+                />
 
-                <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
-                    <div className="px-4 py-5 sm:px-6">
-                        <h3 className="text-lg leading-6 font-medium text-gray-900">Master's Thesis</h3>
-                        <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                            "A Combined GMM and U-Net Pipeline for Multimodal Tissue Segmentation of In Vitro MRI Data"
+                {/* Thesis Information Card */}
+                <div className="glass-card" style={{
+                    marginBottom: 'var(--space-12)',
+                    background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
+                    border: '1px solid var(--primary)'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'start', gap: 'var(--space-4)' }}>
+                        <GraduationCap size={48} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+                        <div>
+                            <h2 style={{
+                                fontSize: 'var(--text-2xl)',
+                                fontWeight: 'var(--font-semibold)',
+                                marginBottom: 'var(--space-2)',
+                                color: 'var(--text-main)'
+                            }}>
+                                Master's Thesis
+                            </h2>
+                            <p style={{
+                                fontSize: 'var(--text-lg)',
+                                color: 'var(--text-secondary)',
+                                fontStyle: 'italic',
+                                marginBottom: 'var(--space-4)',
+                                lineHeight: 'var(--leading-relaxed)'
+                            }}>
+                                "A Combined GMM and U-Net Pipeline for Multimodal Tissue Segmentation of In Vitro MRI Data"
+                            </p>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-6)' }}>
+                                <div>
+                                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', marginBottom: 'var(--space-1)' }}>
+                                        Student
+                                    </div>
+                                    <div style={{ fontSize: 'var(--text-base)', color: 'var(--text-main)', fontWeight: 'var(--font-medium)' }}>
+                                        Mohammed Jamal Dawoud
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', marginBottom: 'var(--space-1)' }}>
+                                        Year
+                                    </div>
+                                    <div style={{ fontSize: 'var(--text-base)', color: 'var(--text-main)', fontWeight: 'var(--font-medium)' }}>
+                                        2025
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Institutions Section */}
+                <Section title="Institutions & Collaboration">
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-6)' }}>
+                        <div className="glass-card hover-lift">
+                            <Building2 size={32} style={{ color: 'var(--primary)', marginBottom: 'var(--space-4)' }} />
+                            <h3 style={{
+                                fontSize: 'var(--text-xl)',
+                                fontWeight: 'var(--font-semibold)',
+                                marginBottom: 'var(--space-2)',
+                                color: 'var(--text-main)'
+                            }}>
+                                HAWK Göttingen
+                            </h3>
+                            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', lineHeight: 'var(--leading-relaxed)' }}>
+                                Hochschule für angewandte Wissenschaft und Kunst
+                            </p>
+                            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', marginTop: 'var(--space-2)' }}>
+                                Primary institution for the Master's program
+                            </p>
+                        </div>
+
+                        <div className="glass-card hover-lift">
+                            <Building2 size={32} style={{ color: 'var(--secondary)', marginBottom: 'var(--space-4)' }} />
+                            <h3 style={{
+                                fontSize: 'var(--text-xl)',
+                                fontWeight: 'var(--font-semibold)',
+                                marginBottom: 'var(--space-2)',
+                                color: 'var(--text-main)'
+                            }}>
+                                DPZ Göttingen
+                            </h3>
+                            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', lineHeight: 'var(--leading-relaxed)' }}>
+                                Deutsches Primatenzentrum
+                            </p>
+                            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', marginTop: 'var(--space-2)' }}>
+                                Research collaboration partner providing MRI data and expertise
+                            </p>
+                        </div>
+                    </div>
+                </Section>
+
+                {/* Supervisors Section */}
+                <Section title="Supervisors">
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-6)' }}>
+                        <div className="glass-card">
+                            <Users size={24} style={{ color: 'var(--primary)', marginBottom: 'var(--space-3)' }} />
+                            <h3 style={{
+                                fontSize: 'var(--text-lg)',
+                                fontWeight: 'var(--font-semibold)',
+                                marginBottom: 'var(--space-1)',
+                                color: 'var(--text-main)'
+                            }}>
+                                Prof. Dr. Roman Grothausmann
+                            </h3>
+                            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>
+                                HAWK Göttingen
+                            </p>
+                        </div>
+
+                        <div className="glass-card">
+                            <Users size={24} style={{ color: 'var(--secondary)', marginBottom: 'var(--space-3)' }} />
+                            <h3 style={{
+                                fontSize: 'var(--text-lg)',
+                                fontWeight: 'var(--font-semibold)',
+                                marginBottom: 'var(--space-1)',
+                                color: 'var(--text-main)'
+                            }}>
+                                Prof. Dr. Susann Boretius
+                            </h3>
+                            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>
+                                Deutsches Primatenzentrum (DPZ)
+                            </p>
+                        </div>
+                    </div>
+                </Section>
+
+                {/* Project Summary */}
+                <Section title="Project Summary">
+                    <div className="glass-card" style={{ padding: 'var(--space-6)' }}>
+                        <p style={{
+                            fontSize: 'var(--text-base)',
+                            color: 'var(--text-secondary)',
+                            lineHeight: 'var(--leading-relaxed)',
+                            marginBottom: 'var(--space-4)'
+                        }}>
+                            This project represents the culmination of research into advanced medical image analysis techniques
+                            applied to the specific domain of brain organoid imaging.
+                        </p>
+                        <p style={{
+                            fontSize: 'var(--text-base)',
+                            color: 'var(--text-secondary)',
+                            lineHeight: 'var(--leading-relaxed)'
+                        }}>
+                            The web application presented here demonstrates the practical implementation of the developed pipeline,
+                            providing tools for data management, pipeline execution, and results analysis. It serves both as a
+                            research tool and as documentation of the methodological approach.
                         </p>
                     </div>
-                    <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
-                        <dl className="sm:divide-y sm:divide-gray-200">
-                            <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                <dt className="text-sm font-medium text-gray-500">Student</dt>
-                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">Mohammed Jamal Dawoud</dd>
-                            </div>
-                            <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                <dt className="text-sm font-medium text-gray-500">Institution</dt>
-                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                    HAWK Hochschule für angewandte Wissenschaft und Kunst
-                                </dd>
-                            </div>
-                            <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                <dt className="text-sm font-medium text-gray-500">Collaboration</dt>
-                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                    Deutsches Primatenzentrum (DPZ), Göttingen
-                                </dd>
-                            </div>
-                            <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                <dt className="text-sm font-medium text-gray-500">Supervisors</dt>
-                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                    <ul className="list-disc pl-5 space-y-1">
-                                        <li>Prof. Dr. Roman Grothausmann (HAWK)</li>
-                                        <li>Prof. Dr. Susann Boretius (DPZ)</li>
-                                    </ul>
-                                </dd>
-                            </div>
-                        </dl>
-                    </div>
-                </div>
-
-                <div className="prose prose-lg text-gray-500">
-                    <p>
-                        This project represents the culmination of research into advanced medical image analysis techniques
-                        applied to the specific domain of brain organoid imaging. The code and results presented here demonstrate
-                        the practical application of the developed pipeline.
-                    </p>
-                </div>
+                </Section>
             </div>
         </>
     );
