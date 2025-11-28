@@ -89,6 +89,38 @@ A GitHub Actions workflow is included in `.github/workflows/ci.yml`. It runs on 
 - Testing (Vitest)
 - Building (Vite Build)
 
+## Running the Pipeline via CLI
+
+The application can be used as a CLI tool to process MRI scans headlessly:
+
+### Process Pending Pipeline Runs
+
+```bash
+# Using Docker Compose
+docker compose run backend python manage.py run_pipeline_jobs
+
+# Process specific run by ID
+docker compose run backend python manage.py run_pipeline_jobs --run-id <uuid>
+
+# Limit number of runs to process
+docker compose run backend python manage.py run_pipeline_jobs --limit 5
+```
+
+### Workflow
+
+1. Create pipeline runs via API (status=PENDING)
+2. Run the management command to process them
+3. Check results via API
+
+This allows the application to be integrated into automated workflows, cron jobs, or batch processing systems.
+
+## API Documentation
+
+Once the backend is running, access the interactive API documentation:
+
+- **Swagger UI**: http://localhost:8000/api/docs/
+- **OpenAPI Schema**: http://localhost:8000/api/schema/
+
 ## Production Considerations
 
 - **Database**: Use a robust database like PostgreSQL instead of SQLite. Update `DATABASES` in `settings.py`.
