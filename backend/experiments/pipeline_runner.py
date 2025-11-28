@@ -196,6 +196,51 @@ class PipelineRunner:
         
         return " ".join(cmd_parts)
     
+    def _generate_placeholder_files(self, scan_id: str, stage: str) -> Dict[str, str]:
+        """
+        Generate actual placeholder files in the media directory for simulation.
+        """
+        from django.conf import settings
+        import os
+        
+        # Ensure media/results directory exists
+        results_dir = os.path.join(settings.MEDIA_ROOT, 'results')
+        os.makedirs(results_dir, exist_ok=True)
+        
+        # 1. Generate dummy NIfTI mask (just a text file)
+        mask_filename = f"{scan_id}_{stage}_mask.nii.gz"
+        mask_path = os.path.join(results_dir, mask_filename)
+        with open(mask_path, 'w') as f:
+            f.write(f"Dummy NIfTI mask for scan {scan_id}, stage {stage}")
+            
+        # 2. Generate dummy preview image (SVG)
+        preview_filename = f"{scan_id}_{stage}_preview.svg"
+        preview_path = os.path.join(results_dir, preview_filename)
+        
+        # Simple SVG with text
+        color = "#3b82f6" if stage == 'gmm' else "#10b981"
+        svg_content = f'''
+        <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100%" height="100%" fill="#1e293b"/>
+            <rect x="50" y="50" width="300" height="200" fill="{color}" opacity="0.5"/>
+            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="sans-serif" font-size="24">
+                {stage.upper()} Result
+            </text>
+            <text x="50%" y="65%" dominant-baseline="middle" text-anchor="middle" fill="#94a3b8" font-family="sans-serif" font-size="14">
+                Scan: {scan_id}
+            </text>
+        </svg>
+        '''
+        
+        with open(preview_path, 'w') as f:
+            f.write(svg_content.strip())
+            
+        # Return relative paths for URL generation
+        return {
+            'mask_path': f"/media/results/{mask_filename}",
+            'preview_path': f"/media/results/{preview_filename}"
+        }
+
     def _create_segmentation_result(
         self,
         mask_path: str,
@@ -207,6 +252,14 @@ class PipelineRunner:
         
         TODO: Replace with actual metrics from pipeline output.
         """
+        # Generate real placeholder files if we are in simulation mode
+        # (detected by checking if paths are the default simulated ones)
+        if "/data/results/" in mask_path:
+            stage = "gmm" if "gmm" in mask_path else "unet"
+            paths = self._generate_placeholder_files(str(self.mri_scan.id), stage)
+            mask_path = paths['mask_path']
+            preview_path = paths['preview_path']
+
         result = SegmentationResult.objects.create(
             pipeline_run=self.pipeline_run,
             mask_path=mask_path,
