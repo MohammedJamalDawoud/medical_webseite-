@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { Brain, Plus, Search } from 'lucide-react';
 import axios from 'axios';
 import SEO from '../components/SEO';
+import PageHeader from '../components/PageHeader';
+import EmptyState from '../components/EmptyState';
 import Skeleton from '../components/Skeleton';
 
 interface Organoid {
@@ -51,22 +53,17 @@ const OrganoidsPage = () => {
                 title="Organoids"
                 description="Manage brain organoid samples for MRI segmentation experiments"
             />
-            <div className="container">
-                <div className="page-header">
-                    <div>
-                        <h1 className="page-title">
-                            <Brain className="inline-block mr-3 text-primary" size={32} />
-                            Organoid Samples
-                        </h1>
-                        <p className="text-muted">
-                            Manage brain organoid samples and their MRI scans
-                        </p>
-                    </div>
-                    <Link to="/organoids/new" className="btn btn-primary">
-                        <Plus className="w-4 h-4 mr-2" />
-                        New Organoid
-                    </Link>
-                </div>
+            <div className="page-container">
+                <PageHeader 
+                    title="Organoid Samples"
+                    subtitle="Manage brain organoid samples and their MRI scans"
+                    actions={
+                        <Link to="/organoids/new" className="btn btn-primary">
+                            <Plus className="w-4 h-4 mr-2" style={{ marginRight: 'var(--space-2)' }} />
+                            New Organoid
+                        </Link>
+                    }
+                />
 
                 {/* Filters */}
                 <div className="glass-card mb-6">

@@ -1,32 +1,48 @@
-import { ArrowDown } from 'lucide-react';
+import { Scan, Settings, BarChart3, Brain, CheckCircle2, ArrowRight } from 'lucide-react';
 import SEO from '../components/SEO';
+import PageHeader from '../components/PageHeader';
 
 const PipelinePage = () => {
     const steps = [
         {
-            title: "1. MRI Acquisition",
-            description: "High-resolution 3D MRI data acquisition at 9.4T using T1w, T2w, and Diffusion-Weighted Imaging sequences.",
-            details: ["Isotropic resolution (100µm)", "Multiple modalities", "Longitudinal imaging"]
+            number: 1,
+            title: "MRI Acquisition",
+            icon: Scan,
+            color: '#3b82f6',
+            description: "High-resolution 3D MRI data acquisition at 9.4T using multiple imaging modalities to capture comprehensive tissue information.",
+            details: ["Isotropic resolution (100µm)", "T1w, T2w, DWI, MGE sequences", "Longitudinal imaging capability"]
         },
         {
-            title: "2. Preprocessing",
-            description: "Standardizing the raw data to ensure consistent quality for downstream analysis.",
-            details: ["N4 Bias Field Correction", "Denoising (Non-local means)", "Intensity Normalization (Z-score)"]
+            number: 2,
+            title: "Preprocessing",
+            icon: Settings,
+            color: '#10b981',
+            description: "Standardizing the raw data to ensure consistent quality and remove artifacts for downstream analysis.",
+            details: ["N4 Bias Field Correction", "Non-local means denoising", "Intensity normalization (Z-score)"]
         },
         {
-            title: "3. GMM Segmentation",
+            number: 3,
+            title: "GMM Segmentation",
+            icon: BarChart3,
+            color: '#f59e0b',
             description: "Unsupervised statistical segmentation using Gaussian Mixture Models to generate initial tissue probability maps.",
-            details: ["3-5 Tissue Classes", "Spatial priors", "Probabilistic output"]
+            details: ["3-5 tissue classes", "Spatial priors integration", "Probabilistic output maps"]
         },
         {
-            title: "4. U-Net Refinement",
+            number: 4,
+            title: "U-Net Refinement",
+            icon: Brain,
+            color: '#8b5cf6',
             description: "Deep learning-based refinement using a 3D U-Net architecture trained on manual annotations and GMM priors.",
-            details: ["Multi-channel input", "3D Convolutions", "Dice Loss optimization"]
+            details: ["Multi-channel input (MRI + GMM)", "3D convolutions", "Dice loss optimization"]
         },
         {
-            title: "5. Evaluation",
-            description: "Quantitative assessment of segmentation accuracy against ground truth.",
-            details: ["Dice Similarity Coefficient", "Jaccard Index", "Volumetric analysis"]
+            number: 5,
+            title: "Evaluation",
+            icon: CheckCircle2,
+            color: '#06b6d4',
+            description: "Quantitative assessment of segmentation accuracy against ground truth annotations.",
+            details: ["Dice Similarity Coefficient", "Jaccard Index (IoU)", "Volumetric analysis"]
         }
     ];
 
@@ -36,47 +52,134 @@ const PipelinePage = () => {
                 title="Processing Pipeline"
                 description="Detailed breakdown of the MRI processing pipeline: Acquisition, Preprocessing, GMM Segmentation, U-Net Refinement, and Evaluation."
             />
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="text-center mb-16">
-                    <h1 className="text-3xl font-bold text-gray-900">Processing Pipeline</h1>
-                    <p className="mt-4 text-xl text-gray-500">
-                        From raw MRI data to quantitative tissue segmentation
-                    </p>
-                </div>
+            <div className="page-container">
+                <PageHeader
+                    title="Processing Pipeline"
+                    subtitle="From raw MRI data to quantitative tissue segmentation"
+                />
 
-                <div className="relative">
-                    {/* Vertical line */}
-                    <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gray-200" aria-hidden="true" />
+                {/* Pipeline Steps */}
+                <div style={{ position: 'relative', maxWidth: '900px', margin: '0 auto' }}>
+                    {/* Vertical connecting line */}
+                    <div style={{
+                        position: 'absolute',
+                        left: '31px',
+                        top: '40px',
+                        bottom: '40px',
+                        width: '2px',
+                        background: 'linear-gradient(180deg, var(--border) 0%, var(--border-subtle) 100%)',
+                        zIndex: 0
+                    }} />
 
-                    <div className="space-y-12">
-                        {steps.map((step, index) => (
-                            <div key={index} className="relative">
-                                <div className="flex items-center justify-center">
-                                    <div className="bg-white border-4 border-primary rounded-full h-12 w-12 flex items-center justify-center z-10">
-                                        <span className="text-primary font-bold text-lg">{index + 1}</span>
-                                    </div>
+                    {steps.map((step, index) => {
+                        const Icon = step.icon;
+                        return (
+                            <div key={index} style={{
+                                position: 'relative',
+                                marginBottom: index < steps.length - 1 ? 'var(--space-12)' : '0',
+                                paddingLeft: '80px'
+                            }}>
+                                {/* Step number circle */}
+                                <div style={{
+                                    position: 'absolute',
+                                    left: '0',
+                                    top: '0',
+                                    width: '64px',
+                                    height: '64px',
+                                    borderRadius: '50%',
+                                    background: `linear-gradient(135deg, ${step.color} 0%, ${step.color}dd 100%)`,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    boxShadow: `0 4px 12px ${step.color}40`,
+                                    zIndex: 1
+                                }}>
+                                    <Icon size={32} color="white" />
                                 </div>
 
-                                <div className="mt-4 bg-white p-6 rounded-lg shadow-md border border-gray-100 relative z-10 max-w-2xl mx-auto">
-                                    <h3 className="text-xl font-bold text-gray-900 mb-2 text-center">{step.title}</h3>
-                                    <p className="text-gray-600 text-center mb-4">{step.description}</p>
-                                    <div className="flex flex-wrap justify-center gap-2">
+                                {/* Step content card */}
+                                <div className="glass-card hover-lift" style={{
+                                    padding: 'var(--space-6)',
+                                    borderLeft: `3px solid ${step.color}`
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
+                                        <span style={{
+                                            fontSize: 'var(--text-sm)',
+                                            fontWeight: 'var(--font-bold)',
+                                            color: step.color,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.05em'
+                                        }}>
+                                            Step {step.number}
+                                        </span>
+                                        <ArrowRight size={16} style={{ color: 'var(--text-muted)' }} />
+                                        <h3 style={{
+                                            fontSize: 'var(--text-2xl)',
+                                            fontWeight: 'var(--font-semibold)',
+                                            color: 'var(--text-main)',
+                                            margin: 0
+                                        }}>
+                                            {step.title}
+                                        </h3>
+                                    </div>
+
+                                    <p style={{
+                                        fontSize: 'var(--text-base)',
+                                        color: 'var(--text-secondary)',
+                                        lineHeight: 'var(--leading-relaxed)',
+                                        marginBottom: 'var(--space-4)'
+                                    }}>
+                                        {step.description}
+                                    </p>
+
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                                         {step.details.map((detail, idx) => (
-                                            <span key={idx} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-50 text-teal-700">
+                                            <span key={idx} style={{
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                padding: 'var(--space-1) var(--space-3)',
+                                                borderRadius: 'var(--radius-sm)',
+                                                fontSize: 'var(--text-xs)',
+                                                fontWeight: 'var(--font-medium)',
+                                                background: `${step.color}20`,
+                                                color: step.color,
+                                                border: `1px solid ${step.color}40`
+                                            }}>
                                                 {detail}
                                             </span>
                                         ))}
                                     </div>
                                 </div>
-
-                                {index < steps.length - 1 && (
-                                    <div className="flex justify-center mt-4 relative z-10">
-                                        <ArrowDown className="h-6 w-6 text-gray-300" />
-                                    </div>
-                                )}
                             </div>
-                        ))}
-                    </div>
+                        );
+                    })}
+                </div>
+
+                {/* Pipeline Summary */}
+                <div className="glass-card" style={{
+                    marginTop: 'var(--space-16)',
+                    padding: 'var(--space-8)',
+                    background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
+                    textAlign: 'center'
+                }}>
+                    <h2 style={{
+                        fontSize: 'var(--text-2xl)',
+                        fontWeight: 'var(--font-semibold)',
+                        marginBottom: 'var(--space-4)',
+                        color: 'var(--text-main)'
+                    }}>
+                        End-to-End Automation
+                    </h2>
+                    <p style={{
+                        fontSize: 'var(--text-lg)',
+                        color: 'var(--text-secondary)',
+                        lineHeight: 'var(--leading-relaxed)',
+                        maxWidth: '700px',
+                        margin: '0 auto'
+                    }}>
+                        This pipeline combines the strengths of classical statistical methods (GMM) with modern deep learning (U-Net)
+                        to achieve robust, accurate tissue segmentation while minimizing manual intervention and observer bias.
+                    </p>
                 </div>
             </div>
         </>
