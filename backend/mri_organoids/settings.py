@@ -164,3 +164,13 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
     'COMPONENT_SPLIT_REQUEST': True,
 }
+
+# Pipeline Configuration
+# Options: 'simulation', 'real'
+PIPELINE_MODE = os.getenv('PIPELINE_MODE', 'simulation')
+
+# CLI Templates for Real Mode
+# These can be overridden by environment variables
+PIPELINE_CLI_PREPROCESSING = os.getenv('PIPELINE_CLI_PREPROCESSING', 'python -m mri_pipeline.preprocessing --input {input_path} --output {output_dir}')
+PIPELINE_CLI_GMM = os.getenv('PIPELINE_CLI_GMM', 'python -m mri_pipeline.gmm --input {input_path} --n_components {n_components}')
+PIPELINE_CLI_UNET = os.getenv('PIPELINE_CLI_UNET', 'python -m mri_pipeline.unet --input {input_path} --model {model_path}')

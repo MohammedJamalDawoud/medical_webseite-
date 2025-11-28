@@ -40,7 +40,7 @@ class PipelineRunnerTest(TestCase):
         self.assertEqual(run.status, "SUCCESS")
         self.assertIsNotNone(run.started_at)
         self.assertIsNotNone(run.finished_at)
-        self.assertIn("Preprocessing", run.log_excerpt)
+        self.assertIn("PREPROCESSING", run.log_excerpt)
     
     def test_gmm_execution_creates_result(self):
         """Test GMM stage creates segmentation result and metrics."""
@@ -87,21 +87,54 @@ class PipelineRunnerTest(TestCase):
         self.assertTrue(hasattr(run, 'segmentation_result'))
     
     def test_cli_command_generation(self):
-        """Test CLI command string generation."""
+        """Test CLI command string generation using settings template."""
         run = PipelineRun.objects.create(
             mri_scan=self.scan,
             stage="GMM",
             status="PENDING",
-            config_json={"n_components": 3, "max_iter": 100}
+            config_json={"n_components": 3}
         )
         
         runner = PipelineRunner(run)
         cmd = runner._build_cli_command("gmm")
         
+        # Should match the default template in settings
         self.assertIn("python -m mri_pipeline.gmm", cmd)
-        self.assertIn(self.scan.file_path, cmd)
+        self.assertIn(f"--input {self.scan.file_path}", cmd)
         self.assertIn("--n_components 3", cmd)
-        self.assertIn("--max_iter 100", cmd)
+
+    def test_real_mode_execution(self):
+        """Test execution in 'real' mode (mocked subprocess)."""
+        run = PipelineRun.objects.create(
+            mri_scan=self.scan,
+            stage="PREPROCESSING",
+            status="PENDING"
+        )
+        
+        runner = PipelineRunner(run)
+        runner.mode = 'real'  # Force real mode
+        
+        # Mock the _execute_real_command method to avoid actual subprocess
+        # We want to test that it calls this method
+        original_execute_real = runner._execute_real_command
+        called = False
+        
+        def mock_execute_real(cmd):
+            nonlocal called
+            called = True
+            return True
+            
+        runner._execute_real_command = mock_execute_real
+        
+        success = runner.execute()
+        
+        self.assertTrue(success)
+        self.assertTrue(called)
+        
+        # Verify status update
+        run.refresh_from_db()
+        self.assertEqual(run.status, "SUCCESS")
+        self.assertIsNotNone(run.cli_command)
 
 
 class ManagementCommandTest(TestCase):
