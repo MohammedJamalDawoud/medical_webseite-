@@ -50,6 +50,7 @@ class MRIScanSerializer(serializers.ModelSerializer):
         model = MRIScan
         fields = [
             'id', 'organoid', 'organoid_name', 'sequence_type',
+            'data_type', 'role',
             'acquisition_date', 'resolution', 'file_path', 'notes',
             'created_at', 'pipeline_runs_count'
         ]
@@ -71,6 +72,7 @@ class PipelineRunSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'mri_scan', 'scan_info', 'stage', 'status',
             'started_at', 'finished_at', 'log_excerpt', 'config_json',
+            'qc_status', 'qc_notes',
             'experiment_config', 'experiment_config_name',
             'model_version', 'model_version_name',
             'docker_image', 'cli_command', 'created_at', 'has_result'
@@ -106,7 +108,7 @@ class SegmentationResultSerializer(serializers.ModelSerializer):
         model = SegmentationResult
         fields = [
             'id', 'pipeline_run', 'pipeline_run_info', 'mask_path',
-            'preview_image_path', 'model_version', 'created_at', 'metrics'
+            'preview_image_path', 'preview_images', 'model_version', 'created_at', 'metrics'
         ]
         read_only_fields = ['id', 'created_at']
     

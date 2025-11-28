@@ -16,6 +16,9 @@ const OrganoidsPage = lazy(() => import('./pages/OrganoidsPage'));
 const OrganoidDetailPage = lazy(() => import('./pages/OrganoidDetailPage'));
 const PipelineRunsPage = lazy(() => import('./pages/PipelineRunsPage'));
 const SegmentationResultsPage = lazy(() => import('./pages/SegmentationResultsPage'));
+const ExperimentConfigsPage = lazy(() => import('./pages/ExperimentConfigsPage'));
+const ModelVersionsPage = lazy(() => import('./pages/ModelVersionsPage'));
+const RunComparisonPage = lazy(() => import('./pages/RunComparisonPage'));
 
 function App() {
   return (
@@ -35,6 +38,9 @@ function App() {
               <Route path="/organoids/:id" element={<OrganoidDetailPage />} />
               <Route path="/scans/:scanId/runs" element={<PipelineRunsPage />} />
               <Route path="/pipeline-runs/:runId/results" element={<SegmentationResultsPage />} />
+              <Route path="/experiment-configs" element={<ExperimentConfigsPage />} />
+              <Route path="/model-versions" element={<ModelVersionsPage />} />
+              <Route path="/compare" element={<RunComparisonPage />} />
             </Routes>
           </Suspense>
         </main>

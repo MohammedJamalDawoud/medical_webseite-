@@ -4,6 +4,7 @@ import { ArrowLeft, BarChart3, Image as ImageIcon, FileText } from 'lucide-react
 import axios from 'axios';
 import SEO from '../components/SEO';
 import Skeleton from '../components/Skeleton';
+import ImageGallery from '../components/ImageGallery';
 
 interface Metric {
     id: string;
@@ -16,6 +17,7 @@ interface SegmentationResult {
     id: string;
     mask_path: string;
     preview_image_path: string;
+    preview_images: Record<string, string>;
     model_version: string;
     created_at: string;
     pipeline_run_info: {
@@ -185,22 +187,17 @@ const SegmentationResultsPage = () => {
                             </div>
                         </div>
 
-                        {result.preview_image_path && (
-                            <div className="glass-card">
-                                <h3 className="font-semibold mb-3 flex items-center gap-2">
-                                    <ImageIcon size={18} />
-                                    Preview
-                                </h3>
-                                <div className="bg-surface-light rounded p-4 text-center">
-                                    <p className="text-sm text-muted">
-                                        Preview image: {result.preview_image_path}
-                                    </p>
-                                    <p className="text-xs text-muted mt-2">
-                                        (Image rendering not yet implemented)
-                                    </p>
-                                </div>
-                            </div>
-                        )}
+                        <div className="glass-card">
+                            <h3 className="font-semibold mb-3 flex items-center gap-2">
+                                <ImageIcon size={18} />
+                                Segmentation Preview
+                            </h3>
+                            <ImageGallery
+                                previewImages={result.preview_images}
+                                primaryImage={result.preview_image_path}
+                                title={`${result.pipeline_run_info.organoid_name} - ${result.pipeline_run_info.stage}`}
+                            />
+                        </div>
 
                         {result.mask_path && (
                             <div className="glass-card">

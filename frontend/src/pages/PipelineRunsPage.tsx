@@ -9,6 +9,8 @@ interface PipelineRun {
     id: string;
     stage: string;
     status: string;
+    qc_status: string;
+    qc_notes: string;
     started_at: string | null;
     finished_at: string | null;
     created_at: string;
@@ -25,6 +27,8 @@ const PipelineRunsPage = () => {
     const [runs, setRuns] = useState<PipelineRun[]>([]);
     const [loading, setLoading] = useState(true);
     const [autoRefresh, setAutoRefresh] = useState(true);
+    const [editingQC, setEditingQC] = useState<string | null>(null);
+    const [qcFormData, setQcFormData] = useState({ qc_status: '', qc_notes: '' });
 
     useEffect(() => {
         if (scanId) {
@@ -95,6 +99,30 @@ const PipelineRunsPage = () => {
         if (duration < 60) return `${Math.round(duration)}s`;
         if (duration < 3600) return `${Math.round(duration / 60)}m`;
         return `${Math.round(duration / 3600)}h`;
+    };
+
+    const getQCBadgeColor = (qcStatus: string) => {
+        switch (qcStatus) {
+            case 'ACCEPTED': return 'bg-green-600';
+            case 'REJECTED': return 'bg-red-600';
+            case 'NOT_REVIEWED': return 'bg-gray-600';
+            default: return 'bg-gray-600';
+        }
+    };
+
+    const handleQCEdit = (run: PipelineRun) => {
+        setEditingQC(run.id);
+        setQcFormData({ qc_status: run.qc_status, qc_notes: run.qc_notes });
+    };
+
+    const handleQCSave = async (runId: string) => {
+        try {
+            await axios.patch(`http://localhost:8000/api/pipeline-runs/${runId}/`, qcFormData);
+            setEditingQC(null);
+            fetchRuns();
+        } catch (error) {
+            console.error('Error updating QC status:', error);
+        }
     };
 
     if (loading) {
@@ -208,6 +236,67 @@ const PipelineRunsPage = () => {
                                         <div className="w-full bg-surface-light rounded-full h-2 overflow-hidden">
                                             <div className="bg-primary h-full animate-pulse" style={{ width: '60%' }}></div>
                                         </div>
+                                    </div>
+                                )}
+
+                                {/* QC Panel */}
+                                {run.status === 'SUCCESS' && (
+                                    <div className="mt-4 pt-4 border-t border-border">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <h4 className="font-semibold text-sm">Quality Control</h4>
+                                            {editingQC !== run.id && (
+                                                <button
+                                                    onClick={() => handleQCEdit(run)}
+                                                    className="text-xs text-primary hover:underline"
+                                                >
+                                                    Edit QC
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        {editingQC === run.id ? (
+                                            <div className="space-y-3">
+                                                <select
+                                                    value={qcFormData.qc_status}
+                                                    onChange={(e) => setQcFormData({ ...qcFormData, qc_status: e.target.value })}
+                                                    className="w-full px-3 py-2 rounded bg-surface-light border border-border"
+                                                >
+                                                    <option value="NOT_REVIEWED">Not Reviewed</option>
+                                                    <option value="ACCEPTED">Accepted</option>
+                                                    <option value="REJECTED">Rejected</option>
+                                                </select>
+                                                <textarea
+                                                    value={qcFormData.qc_notes}
+                                                    onChange={(e) => setQcFormData({ ...qcFormData, qc_notes: e.target.value })}
+                                                    placeholder="QC notes and observations..."
+                                                    className="w-full px-3 py-2 rounded bg-surface-light border border-border"
+                                                    rows={3}
+                                                />
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => handleQCSave(run.id)}
+                                                        className="btn btn-primary btn-sm"
+                                                    >
+                                                        Save
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setEditingQC(null)}
+                                                        className="btn btn-secondary btn-sm"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div>
+                                                <span className={`px-2 py-1 rounded text-xs font-medium text-white ${getQCBadgeColor(run.qc_status)}`}>
+                                                    {run.qc_status.replace('_', ' ')}
+                                                </span>
+                                                {run.qc_notes && (
+                                                    <p className="text-sm text-muted mt-2">{run.qc_notes}</p>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>

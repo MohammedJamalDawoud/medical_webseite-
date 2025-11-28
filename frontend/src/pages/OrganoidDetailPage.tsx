@@ -19,6 +19,8 @@ interface Organoid {
 interface MRIScan {
     id: string;
     sequence_type: string;
+    data_type: string;
+    role: string;
     acquisition_date: string;
     resolution: string;
     file_path: string;
@@ -31,6 +33,25 @@ const OrganoidDetailPage = () => {
     const [organoid, setOrganoid] = useState<Organoid | null>(null);
     const [scans, setScans] = useState<MRIScan[]>([]);
     const [loading, setLoading] = useState(true);
+
+    const getDataTypeBadgeColor = (dataType: string) => {
+        switch (dataType) {
+            case 'IN_VITRO': return 'bg-blue-600';
+            case 'EX_VIVO': return 'bg-purple-600';
+            case 'IN_VIVO': return 'bg-green-600';
+            default: return 'bg-gray-600';
+        }
+    };
+
+    const getRoleBadgeColor = (role: string) => {
+        switch (role) {
+            case 'TRAIN': return 'bg-emerald-600';
+            case 'VAL': return 'bg-amber-600';
+            case 'TEST': return 'bg-rose-600';
+            case 'UNASSIGNED': return 'bg-gray-500';
+            default: return 'bg-gray-500';
+        }
+    };
 
     useEffect(() => {
         if (id) {
@@ -176,6 +197,14 @@ const OrganoidDetailPage = () => {
                                                 <Calendar className="inline w-4 h-4 mr-1" />
                                                 {scan.acquisition_date ? new Date(scan.acquisition_date).toLocaleDateString() : 'No date'}
                                             </p>
+                                            <div className="flex gap-2 mt-2">
+                                                <span className={`px-2 py-1 rounded text-xs font-medium text-white ${getDataTypeBadgeColor(scan.data_type)}`}>
+                                                    {scan.data_type?.replace('_', ' ')}
+                                                </span>
+                                                <span className={`px-2 py-1 rounded text-xs font-medium text-white ${getRoleBadgeColor(scan.role)}`}>
+                                                    {scan.role}
+                                                </span>
+                                            </div>
                                         </div>
                                         <span className="badge badge-secondary">{scan.resolution}</span>
                                     </div>

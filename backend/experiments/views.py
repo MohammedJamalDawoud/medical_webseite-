@@ -74,10 +74,17 @@ class MRIScanViewSet(viewsets.ModelViewSet):
         queryset = super().get_queryset()
         organoid = self.request.query_params.get('organoid', None)
         sequence_type = self.request.query_params.get('sequence_type', None)
+        data_type = self.request.query_params.get('data_type', None)
+        role = self.request.query_params.get('role', None)
+        
         if organoid:
             queryset = queryset.filter(organoid=organoid)
         if sequence_type:
             queryset = queryset.filter(sequence_type=sequence_type)
+        if data_type:
+            queryset = queryset.filter(data_type=data_type)
+        if role:
+            queryset = queryset.filter(role=role)
         return queryset
 
 

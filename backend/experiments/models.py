@@ -75,10 +75,25 @@ class MRIScan(models.Model):
         ('FLAIR', 'FLAIR'),
         ('OTHER', 'Other'),
     ]
+
+    DATA_TYPE_CHOICES = [
+        ('IN_VITRO', 'In Vitro'),
+        ('EX_VIVO', 'Ex Vivo'),
+        ('IN_VIVO', 'In Vivo'),
+    ]
+
+    ROLE_CHOICES = [
+        ('TRAIN', 'Training'),
+        ('VAL', 'Validation'),
+        ('TEST', 'Testing'),
+        ('UNASSIGNED', 'Unassigned'),
+    ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     organoid = models.ForeignKey(Organoid, on_delete=models.CASCADE, related_name='scans')
     sequence_type = models.CharField(max_length=50, choices=SEQUENCE_CHOICES)
+    data_type = models.CharField(max_length=20, choices=DATA_TYPE_CHOICES, default='IN_VITRO')
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='UNASSIGNED')
     acquisition_date = models.DateField(null=True, blank=True)
     resolution = models.CharField(max_length=100, help_text="e.g., '100 μm isotropic'")
     file_path = models.CharField(max_length=500, blank=True, help_text="Path to NIfTI file")
@@ -109,6 +124,12 @@ class PipelineRun(models.Model):
         ('SUCCESS', 'Success'),
         ('FAILED', 'Failed'),
     ]
+
+    QC_STATUS_CHOICES = [
+        ('NOT_REVIEWED', 'Not Reviewed'),
+        ('ACCEPTED', 'Accepted'),
+        ('REJECTED', 'Rejected'),
+    ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     mri_scan = models.ForeignKey(MRIScan, on_delete=models.CASCADE, related_name='pipeline_runs')
@@ -118,6 +139,8 @@ class PipelineRun(models.Model):
     finished_at = models.DateTimeField(null=True, blank=True)
     log_excerpt = models.TextField(blank=True)
     config_json = models.JSONField(null=True, blank=True, help_text="Configuration parameters")
+    qc_status = models.CharField(max_length=20, choices=QC_STATUS_CHOICES, default='NOT_REVIEWED', help_text="Quality control status")
+    qc_notes = models.TextField(blank=True, help_text="Quality control notes and observations")
     experiment_config = models.ForeignKey(
         ExperimentConfig, 
         on_delete=models.SET_NULL, 
@@ -152,7 +175,8 @@ class SegmentationResult(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     pipeline_run = models.OneToOneField(PipelineRun, on_delete=models.CASCADE, related_name='segmentation_result')
     mask_path = models.CharField(max_length=500, blank=True, help_text="Path to segmentation mask")
-    preview_image_path = models.CharField(max_length=500, blank=True, help_text="Path to preview PNG")
+    preview_image_path = models.CharField(max_length=500, blank=True, help_text="Path to preview PNG (primary)")
+    preview_images = models.JSONField(default=dict, blank=True, help_text="Dictionary of preview image paths (axial, sagittal, coronal)")
     model_version = models.CharField(max_length=100, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
