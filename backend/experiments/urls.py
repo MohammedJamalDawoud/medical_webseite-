@@ -12,6 +12,7 @@ from .views import (
     MetricViewSet
 )
 from .auth_views import RegisterView, current_user, logout_view
+from .upload_views import upload_scan_file, create_scan_with_upload
 
 # Create router and register viewsets
 router = DefaultRouter()
@@ -30,6 +31,10 @@ urlpatterns = [
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/logout/', logout_view, name='auth_logout'),
     path('auth/me/', current_user, name='current_user'),
+    
+    # File upload endpoints - Phase 14A
+    path('scans/<uuid:scan_id>/upload/', upload_scan_file, name='upload_scan_file'),
+    path('scans/upload/', create_scan_with_upload, name='create_scan_with_upload'),
     
     # API endpoints
     path('', include(router.urls)),

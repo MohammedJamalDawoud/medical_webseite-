@@ -65,6 +65,7 @@ class Organoid(models.Model):
 class MRIScan(models.Model):
     """
     Represents an MRI scan acquisition of an organoid sample.
+    Supports both simulated and real NIfTI file uploads.
     """
     SEQUENCE_CHOICES = [
         ('T1W', 'T1-weighted'),
@@ -88,6 +89,15 @@ class MRIScan(models.Model):
         ('TEST', 'Testing'),
         ('UNASSIGNED', 'Unassigned'),
     ]
+
+    UPLOAD_STATUS_CHOICES = [
+        ('PENDING', 'Pending Upload'),
+        ('UPLOADING', 'Uploading'),
+        ('UPLOADED', 'Upload Complete'),
+        ('PROCESSING', 'Processing'),
+        ('READY', 'Ready'),
+        ('FAILED', 'Upload Failed'),
+    ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     organoid = models.ForeignKey(Organoid, on_delete=models.CASCADE, related_name='scans')
@@ -96,16 +106,31 @@ class MRIScan(models.Model):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='UNASSIGNED')
     acquisition_date = models.DateField(null=True, blank=True)
     resolution = models.CharField(max_length=100, help_text="e.g., '100 μm isotropic'")
-    file_path = models.CharField(max_length=500, blank=True, help_text="Path to NIfTI file")
-    created_at = models.DateTimeField(auto_now_add=True)
     notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     
-    def __str__(self):
-        return f"{self.organoid.name} - {self.sequence_type} ({self.acquisition_date})"
-    
-    class Meta:
-        ordering = ['-acquisition_date']
-
+    # File upload fields - Phase 14A
+    file_path = models.FileField(
+        upload_to='mri_scans/%Y/%m/%d/',
+        null=True,
+        blank=True,
+        help_text="Uploaded NIfTI file (.nii or .nii.gz)"
+    )
+    file_size = models.BigIntegerField(
+        null=True,
+        blank=True,
+        help_text="File size in bytes"
+    )
+    file_hash = models.CharField(
+        max_length=64,
+        blank=True,
+        help_text="SHA-256 hash for integrity"
+    )
+    upload_status = models.CharField(
+        max_length=20,
+        choices=UPLOAD_STATUS_CHOICES,
+        default='PENDING',
+        help_text="Upload and processing status"
 
 class PipelineRun(models.Model):
     """

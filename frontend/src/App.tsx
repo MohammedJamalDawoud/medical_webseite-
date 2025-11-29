@@ -23,6 +23,7 @@ const RunComparisonPage = lazy(() => import('./pages/RunComparisonPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const UserProfilePage = lazy(() => import('./pages/UserProfilePage'));
+const UploadScanPage = lazy(() => import('./pages/UploadScanPage'));
 
 function App() {
   return (
@@ -77,6 +78,11 @@ function App() {
               <Route path="/compare" element={
                 <ProtectedRoute>
                   <RunComparisonPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/upload" element={
+                <ProtectedRoute>
+                  <UploadScanPage />
                 </ProtectedRoute>
               } />
 
