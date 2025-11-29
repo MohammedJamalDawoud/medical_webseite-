@@ -131,6 +131,26 @@ class MRIScan(models.Model):
         choices=UPLOAD_STATUS_CHOICES,
         default='PENDING',
         help_text="Upload and processing status"
+    )
+    upload_error = models.TextField(
+        blank=True,
+        help_text="Error message if upload failed"
+    )
+    
+    # Preview image - Phase 14B
+    preview_image = models.ImageField(
+        upload_to='previews/',
+        null=True,
+        blank=True,
+        help_text="Preview image (axial view, middle slice)"
+    )
+    
+    def __str__(self):
+        return f"{self.organoid.name} - {self.sequence_type} ({self.acquisition_date})"
+    
+    class Meta:
+        ordering = ['-acquisition_date']
+
 
 class PipelineRun(models.Model):
     """

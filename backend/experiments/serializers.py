@@ -43,6 +43,27 @@ class OrganoidSerializer(serializers.ModelSerializer):
 
 class MRIScanSerializer(serializers.ModelSerializer):
     """Serializer for MRIScan model."""
+    organoid_name = serializers.CharField(source='organoid.name', read_only=True)
+    pipeline_runs_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = MRIScan
+        fields = [
+            'id', 'organoid', 'organoid_name', 'sequence_type', 'data_type', 'role',
+            'acquisition_date', 'resolution', 'notes', 'created_at', 
+            'pipeline_runs_count',
+            # File upload fields
+            'file_path', 'file_size', 'file_hash', 'upload_status', 'upload_error',
+            # Preview image
+            'preview_image'
+        ]
+        read_only_fields = ['id', 'created_at', 'file_size', 'file_hash', 'upload_status', 'upload_error']
+    
+    def get_pipeline_runs_count(self, obj):
+        return obj.pipeline_runs.count()
+
+
+class PipelineRunSerializer(serializers.ModelSerializer):
     """Serializer for PipelineRun model."""
     scan_info = serializers.SerializerMethodField()
     has_result = serializers.SerializerMethodField()
