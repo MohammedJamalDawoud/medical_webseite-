@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     
     # Third-party
     'rest_framework',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'drf_spectacular',
     
@@ -149,8 +151,11 @@ CORS_ALLOWED_ORIGINS = [
 # Django REST Framework Settings
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',  # For dev simplicity, restrict in production
+        'rest_framework.permissions.IsAuthenticated',  # Require auth by default
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
@@ -174,3 +179,29 @@ PIPELINE_MODE = os.getenv('PIPELINE_MODE', 'simulation')
 PIPELINE_CLI_PREPROCESSING = os.getenv('PIPELINE_CLI_PREPROCESSING', 'python -m mri_pipeline.preprocessing --input {input_path} --output {output_dir}')
 PIPELINE_CLI_GMM = os.getenv('PIPELINE_CLI_GMM', 'python -m mri_pipeline.gmm --input {input_path} --n_components {n_components}')
 PIPELINE_CLI_UNET = os.getenv('PIPELINE_CLI_UNET', 'python -m mri_pipeline.unet --input {input_path} --model {model_path}')
+
+# Simple JWT Settings
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': True,
+    
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+    'JTI_CLAIM': 'jti',
+}
+
+# CORS Settings - Allow credentials for JWT
+CORS_ALLOW_CREDENTIALS = True
