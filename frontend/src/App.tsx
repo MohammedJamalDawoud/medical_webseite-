@@ -19,6 +19,8 @@ const SegmentationResultsPage = lazy(() => import('./pages/SegmentationResultsPa
 const ExperimentConfigsPage = lazy(() => import('./pages/ExperimentConfigsPage'));
 const ModelVersionsPage = lazy(() => import('./pages/ModelVersionsPage'));
 const RunComparisonPage = lazy(() => import('./pages/RunComparisonPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 
 function App() {
   return (
@@ -41,6 +43,10 @@ function App() {
               <Route path="/experiment-configs" element={<ExperimentConfigsPage />} />
               <Route path="/model-versions" element={<ModelVersionsPage />} />
               <Route path="/compare" element={<RunComparisonPage />} />
+
+              {/* Authentication routes */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
             </Routes>
           </Suspense>
         </main>
