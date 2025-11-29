@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import axios from 'axios';
+import { useToast } from '../context/ToastContext';
 
 interface User {
     id: string;
@@ -32,6 +33,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const { showToast } = useToast();
 
     useEffect(() => {
         checkAuth();
@@ -74,6 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
 
         await checkAuth();
+        showToast('Welcome back! You have successfully logged in.', 'success');
     };
 
     const logout = async () => {
@@ -97,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             localStorage.removeItem('refresh_token');
             delete axios.defaults.headers.common['Authorization'];
             setUser(null);
+            showToast('You have been logged out successfully.', 'info');
         }
     };
 
@@ -110,6 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
 
         await checkAuth();
+        showToast(`Welcome ${data.username}! Your account has been created successfully.`, 'success');
     };
 
     return (

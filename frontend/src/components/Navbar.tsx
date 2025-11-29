@@ -1,9 +1,14 @@
-import { Link, useLocation } from 'react-router-dom';
-import { Activity, Brain, FileText, Home, Layers, Settings, GitCompare } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Activity, Brain, FileText, Home, Layers, Settings, GitCompare, User, LogOut, LogIn } from 'lucide-react';
+import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import DarkModeToggle from './DarkModeToggle';
 
 const Navbar = () => {
     const location = useLocation();
+    const navigate = useNavigate();
+    const { user, logout, isAuthenticated } = useAuth();
+    const [showUserMenu, setShowUserMenu] = useState(false);
 
     const isActive = (path: string) => {
         return location.pathname === path;
@@ -14,6 +19,12 @@ const Navbar = () => {
         return isActive(path)
             ? `${baseClass} text-primary nav-link-active`
             : `${baseClass} text-muted hover:text-primary`;
+    };
+
+    const handleLogout = async () => {
+        await logout();
+        setShowUserMenu(false);
+        navigate('/login');
     };
 
     return (
@@ -55,40 +66,44 @@ const Navbar = () => {
                                 margin: '0 var(--space-2)'
                             }} />
 
-                            {/* Data & Experiments */}
-                            <Link to="/experiments" className={navLinkClass('/experiments')}>
-                                <Activity className="h-4 w-4 mr-1 inline" /> Experiments
-                            </Link>
-                            <Link to="/organoids" className={navLinkClass('/organoids')}>
-                                <Brain className="h-4 w-4 mr-1 inline" /> Organoids
-                            </Link>
-                            <Link to="/compare" className={navLinkClass('/compare')}>
-                                <GitCompare className="h-4 w-4 mr-1 inline" /> Compare
-                            </Link>
+                            {/* Data & Experiments - Show only if authenticated */}
+                            {isAuthenticated && (
+                                <>
+                                    <Link to="/experiments" className={navLinkClass('/experiments')}>
+                                        <Activity className="h-4 w-4 mr-1 inline" /> Experiments
+                                    </Link>
+                                    <Link to="/organoids" className={navLinkClass('/organoids')}>
+                                        <Brain className="h-4 w-4 mr-1 inline" /> Organoids
+                                    </Link>
+                                    <Link to="/compare" className={navLinkClass('/compare')}>
+                                        <GitCompare className="h-4 w-4 mr-1 inline" /> Compare
+                                    </Link>
 
-                            {/* Divider */}
-                            <div style={{
-                                width: '1px',
-                                height: '20px',
-                                background: 'var(--border)',
-                                margin: '0 var(--space-2)'
-                            }} />
+                                    {/* Divider */}
+                                    <div style={{
+                                        width: '1px',
+                                        height: '20px',
+                                        background: 'var(--border)',
+                                        margin: '0 var(--space-2)'
+                                    }} />
 
-                            {/* Configuration */}
-                            <Link to="/experiment-configs" className={navLinkClass('/experiment-configs')}>
-                                <Settings className="h-4 w-4 mr-1 inline" /> Configs
-                            </Link>
-                            <Link to="/model-versions" className={navLinkClass('/model-versions')}>
-                                Models
-                            </Link>
+                                    {/* Configuration */}
+                                    <Link to="/experiment-configs" className={navLinkClass('/experiment-configs')}>
+                                        <Settings className="h-4 w-4 mr-1 inline" /> Configs
+                                    </Link>
+                                    <Link to="/model-versions" className={navLinkClass('/model-versions')}>
+                                        Models
+                                    </Link>
 
-                            {/* Divider */}
-                            <div style={{
-                                width: '1px',
-                                height: '20px',
-                                background: 'var(--border)',
-                                margin: '0 var(--space-2)'
-                            }} />
+                                    {/* Divider */}
+                                    <div style={{
+                                        width: '1px',
+                                        height: '20px',
+                                        background: 'var(--border)',
+                                        margin: '0 var(--space-2)'
+                                    }} />
+                                </>
+                            )}
 
                             {/* Info */}
                             <Link to="/publications" className={navLinkClass('/publications')}>
@@ -100,12 +115,153 @@ const Navbar = () => {
                         </div>
                     </div>
 
-                    {/* Dark Mode Toggle */}
-                    <div className="flex items-center" style={{ marginLeft: 'var(--space-6)' }}>
+                    {/* Right Side - Auth & Dark Mode */}
+                    <div className="flex items-center" style={{ gap: 'var(--space-4)' }}>
+                        {/* Authentication UI */}
+                        {isAuthenticated ? (
+                            <div style={{ position: 'relative' }}>
+                                <button
+                                    onClick={() => setShowUserMenu(!showUserMenu)}
+                                    className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all"
+                                    style={{
+                                        background: showUserMenu ? 'var(--bg-elevated)' : 'transparent',
+                                        border: '1px solid var(--border)',
+                                        color: 'var(--text-main)',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    <User size={16} />
+                                    <span style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>
+                                        {user?.username}
+                                    </span>
+                                </button>
+
+                                {/* User Dropdown Menu */}
+                                {showUserMenu && (
+                                    <div
+                                        style={{
+                                            position: 'absolute',
+                                            top: 'calc(100% + 8px)',
+                                            right: 0,
+                                            background: 'var(--bg-elevated)',
+                                            border: '1px solid var(--border)',
+                                            borderRadius: 'var(--radius-lg)',
+                                            boxShadow: 'var(--glass-shadow)',
+                                            minWidth: '200px',
+                                            zIndex: 1000
+                                        }}
+                                    >
+                                        <div style={{ padding: 'var(--space-3)', borderBottom: '1px solid var(--border)' }}>
+                                            <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)', color: 'var(--text-main)' }}>
+                                                {user?.username}
+                                            </div>
+                                            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginTop: 'var(--space-1)' }}>
+                                                {user?.email}
+                                            </div>
+                                        </div>
+
+                                        <div style={{ padding: 'var(--space-2)' }}>
+                                            <Link
+                                                to="/profile"
+                                                onClick={() => setShowUserMenu(false)}
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 'var(--space-2)',
+                                                    padding: 'var(--space-2) var(--space-3)',
+                                                    borderRadius: 'var(--radius-md)',
+                                                    color: 'var(--text-main)',
+                                                    textDecoration: 'none',
+                                                    fontSize: 'var(--text-sm)',
+                                                    transition: 'background 0.2s'
+                                                }}
+                                                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-hover)'}
+                                                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                            >
+                                                <User size={16} />
+                                                Profile
+                                            </Link>
+
+                                            <button
+                                                onClick={handleLogout}
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 'var(--space-2)',
+                                                    padding: 'var(--space-2) var(--space-3)',
+                                                    borderRadius: 'var(--radius-md)',
+                                                    color: 'var(--text-main)',
+                                                    fontSize: 'var(--text-sm)',
+                                                    background: 'transparent',
+                                                    border: 'none',
+                                                    width: '100%',
+                                                    textAlign: 'left',
+                                                    cursor: 'pointer',
+                                                    transition: 'background 0.2s'
+                                                }}
+                                                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-hover)'}
+                                                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                            >
+                                                <LogOut size={16} />
+                                                Logout
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                                <Link
+                                    to="/login"
+                                    className="btn btn-secondary"
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 'var(--space-2)',
+                                        padding: 'var(--space-2) var(--space-4)',
+                                        fontSize: 'var(--text-sm)'
+                                    }}
+                                >
+                                    <LogIn size={16} />
+                                    Login
+                                </Link>
+                                <Link
+                                    to="/register"
+                                    className="btn btn-primary"
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 'var(--space-2)',
+                                        padding: 'var(--space-2) var(--space-4)',
+                                        fontSize: 'var(--text-sm)'
+                                    }}
+                                >
+                                    <User size={16} />
+                                    Register
+                                </Link>
+                            </div>
+                        )}
+
+                        {/* Dark Mode Toggle */}
                         <DarkModeToggle />
                     </div>
                 </div>
             </div>
+
+            {/* Click outside to close menu */}
+            {showUserMenu && (
+                <div
+                    onClick={() => setShowUserMenu(false)}
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        zIndex: 999
+                    }}
+                />
+            )}
         </nav>
     );
 };
