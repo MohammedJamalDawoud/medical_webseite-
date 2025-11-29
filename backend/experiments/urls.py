@@ -9,7 +9,9 @@ from .views import (
     MRIScanViewSet,
     PipelineRunViewSet,
     SegmentationResultViewSet,
-    MetricViewSet
+    MetricViewSet,
+    analytics_overview,
+    analytics_metrics
 )
 from .auth_views import RegisterView, current_user, logout_view
 from .upload_views import upload_scan_file, create_scan_with_upload
@@ -35,6 +37,10 @@ urlpatterns = [
     # File upload endpoints - Phase 14A
     path('scans/<uuid:scan_id>/upload/', upload_scan_file, name='upload_scan_file'),
     path('scans/upload/', create_scan_with_upload, name='create_scan_with_upload'),
+    
+    # Analytics endpoints
+    path('analytics/overview/', analytics_overview, name='analytics_overview'),
+    path('analytics/metrics/', analytics_metrics, name='analytics_metrics'),
     
     # API endpoints
     path('', include(router.urls)),
