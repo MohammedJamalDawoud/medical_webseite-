@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Activity, Brain, FileText, Home, Layers, Settings, GitCompare, User, LogOut, LogIn } from 'lucide-react';
+import { Activity, Brain, FileText, Home, Layers, Settings, GitCompare, User, LogOut, LogIn, Database, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import DarkModeToggle from './DarkModeToggle';
@@ -71,6 +71,15 @@ const Navbar = () => {
                                 <>
                                     <Link to="/experiments" className={navLinkClass('/experiments')}>
                                         <Activity className="h-4 w-4 mr-1 inline" /> Experiments
+                                    </Link>
+                                    <Link to="/analysis" className={navLinkClass('/analysis')}>
+                                        <Activity className="h-4 w-4 mr-1 inline" /> Analysis
+                                    </Link>
+                                    <Link to="/bids-datasets" className={navLinkClass('/bids-datasets')}>
+                                        <Database className="h-4 w-4 mr-1 inline" /> BIDS
+                                    </Link>
+                                    <Link to="/docs-assistant" className={navLinkClass('/docs-assistant')}>
+                                        <Sparkles className="h-4 w-4 mr-1 inline" /> Docs Assistant
                                     </Link>
                                     <Link to="/organoids" className={navLinkClass('/organoids')}>
                                         <Brain className="h-4 w-4 mr-1 inline" /> Organoids
