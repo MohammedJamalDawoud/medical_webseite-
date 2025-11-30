@@ -48,10 +48,12 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'drf_spectacular',
+    'channels',  # WebSocket support
     
     # Local apps
     'core',
     'experiments',
+    'ai_assistant',  # RAG-based documentation and experiment assistant
 ]
 
 MIDDLEWARE = [
@@ -205,3 +207,20 @@ SIMPLE_JWT = {
 
 # CORS Settings - Allow credentials for JWT
 CORS_ALLOW_CREDENTIALS = True
+
+# AI Assistant Configuration (Optional - for RAG-based documentation Q&A)
+# This feature is completely optional and controlled via environment variables
+AI_ASSISTANT_ENABLED = os.getenv('AI_ASSISTANT_ENABLED', 'True').lower() == 'true'
+AI_VECTOR_INDEX_PATH = BASE_DIR / 'ai_index'
+AI_LLM_PROVIDER = os.getenv('AI_LLM_PROVIDER', None)  # 'openai' or None (for future use)
+AI_LLM_API_KEY = os.getenv('AI_LLM_API_KEY', None)  # For future LLM integration
+AI_LLM_MODEL = os.getenv('AI_LLM_MODEL', 'gpt-4')  # For future LLM integration
+
+# Channels (WebSocket) Configuration
+ASGI_APPLICATION = 'mri_organoids.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',  # Use Redis in production
+    },
+}
