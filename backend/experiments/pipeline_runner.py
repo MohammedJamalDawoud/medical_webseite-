@@ -16,8 +16,55 @@ from typing import Dict, Any, Optional
 from django.utils import timezone
 from django.conf import settings
 from experiments.models import PipelineRun, SegmentationResult, Metric
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+import datetime as dt
 
 logger = logging.getLogger(__name__)
+
+
+
+def broadcast_pipeline_status(run_id, status, stage=None, progress=None, message=None):
+    """
+    Broadcast pipeline status update via WebSocket.
+    
+    Args:
+        run_id: PipelineRun ID
+        status: Status string (queued/running/completed/failed)
+        stage: Current stage (preprocessing/segmentation/metrics)
+        progress: Progress percentage (0-100)
+        message: Status message
+    """
+    channel_layer = get_channel_layer()
+    if channel_layer:
+        try:
+            async_to_sync(channel_layer.group_send)(
+                "pipeline_updates",
+                {
+                    'type': 'pipeline.status',
+                    'run_id': run_id,
+                    'status': status,
+                    'stage': stage,
+                    'progress': progress,
+                    'message': message,
+                    'timestamp': dt.datetime.now().isoformat(),
+                }
+            )
+            # Also send to specific pipeline group
+            async_to_sync(channel_layer.group_send)(
+                f"pipeline_{run_id}",
+                {
+                    'type': 'pipeline.status',
+                    'run_id': run_id,
+                    'status': status,
+                    'stage': stage,
+                    'progress': progress,
+                    'message': message,
+                    'timestamp': dt.datetime.now().isoformat(),
+                }
+            )
+        except Exception as e:
+            logger.warning(f"Failed to broadcast status: {e}")
 
 
 class PipelineRunner:
@@ -48,6 +95,15 @@ class PipelineRunner:
             self.pipeline_run.started_at = timezone.now()
             self.pipeline_run.save()
             
+            # Broadcast: Pipeline started
+            broadcast_pipeline_status(
+                run_id=self.pipeline_run.id,
+                status='running',
+                stage='starting',
+                progress=0,
+                message=f'Starting {self.pipeline_run.stage} pipeline'
+            )
+            
             logger.info(f"Starting pipeline run {self.pipeline_run.id} for scan {self.mri_scan.id} in {self.mode} mode")
             
             # Execute based on stage
@@ -67,6 +123,16 @@ class PipelineRunner:
                 self.pipeline_run.status = 'SUCCESS'
                 self.pipeline_run.finished_at = timezone.now()
                 self.pipeline_run.save()
+                
+                # Broadcast: Pipeline completed
+                broadcast_pipeline_status(
+                    run_id=self.pipeline_run.id,
+                    status='completed',
+                    stage='finished',
+                    progress=100,
+                    message='Pipeline completed successfully'
+                )
+                
                 logger.info(f"Pipeline run {self.pipeline_run.id} completed successfully")
             else:
                 self._mark_failed("Pipeline execution returned failure")
