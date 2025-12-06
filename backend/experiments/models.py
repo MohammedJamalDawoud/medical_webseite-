@@ -242,3 +242,39 @@ class Metric(models.Model):
     
     def __str__(self):
         return f"{self.metric_name}: {self.metric_value} {self.unit}"
+
+
+class BIDSDataset(models.Model):
+    """
+    Represents a BIDS-formatted dataset on the server filesystem.
+    Does not store files, but points to a root directory.
+    """
+    VALIDATION_STATUS_CHOICES = [
+        ('NOT_RUN', 'Not Run'),
+        ('PASSED', 'Passed'),
+        ('WARNINGS', 'Passed with Warnings'),
+        ('FAILED', 'Failed'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=200, help_text="Human-readable name for the dataset")
+    root_path = models.CharField(max_length=500, help_text="Absolute path to BIDS root directory")
+    description = models.TextField(blank=True)
+    bids_version = models.CharField(max_length=20, blank=True, help_text="BIDS version (e.g., 1.8.0)")
+    
+    last_validated_at = models.DateTimeField(null=True, blank=True)
+    last_validation_status = models.CharField(
+        max_length=20, 
+        choices=VALIDATION_STATUS_CHOICES, 
+        default='NOT_RUN'
+    )
+    last_validation_summary = models.TextField(blank=True, help_text="Summary of last validation result")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['-created_at']

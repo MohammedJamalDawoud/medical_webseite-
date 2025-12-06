@@ -10,8 +10,13 @@ from .views import (
     PipelineRunViewSet,
     SegmentationResultViewSet,
     MetricViewSet,
+    BIDSDatasetViewSet,
     analytics_overview,
-    analytics_metrics
+    analytics_metrics,
+    export_metrics_csv,
+    export_experiments_csv,
+    export_runs_csv,
+    export_analytics_csv
 )
 from .auth_views import RegisterView, current_user, logout_view
 from .upload_views import upload_scan_file, create_scan_with_upload
@@ -25,6 +30,7 @@ router.register(r'scans', MRIScanViewSet, basename='scan')
 router.register(r'pipeline-runs', PipelineRunViewSet, basename='pipelinerun')
 router.register(r'segmentation-results', SegmentationResultViewSet, basename='segmentationresult')
 router.register(r'metrics', MetricViewSet, basename='metric')
+router.register(r'bids-datasets', BIDSDatasetViewSet, basename='bidsdataset')
 
 urlpatterns = [
     # Authentication endpoints
@@ -34,13 +40,19 @@ urlpatterns = [
     path('auth/logout/', logout_view, name='auth_logout'),
     path('auth/me/', current_user, name='current_user'),
     
-    # File upload endpoints - Phase 14A
+    # File upload endpoints
     path('scans/<uuid:scan_id>/upload/', upload_scan_file, name='upload_scan_file'),
     path('scans/upload/', create_scan_with_upload, name='create_scan_with_upload'),
     
     # Analytics endpoints
-    path('analytics/overview/', analytics_overview, name='analytics_overview'),
-    path('analytics/metrics/', analytics_metrics, name='analytics_metrics'),
+    path('analytics/overview/', analytics_overview, name='analytics-overview'),
+    path('analytics/metrics/', analytics_metrics, name='analytics-metrics'),
+    
+    # Export endpoints
+    path('exports/metrics.csv', export_metrics_csv, name='export-metrics-csv'),
+    path('exports/experiments.csv', export_experiments_csv, name='export-experiments-csv'),
+    path('exports/runs.csv', export_runs_csv, name='export-runs-csv'),
+    path('exports/analytics.csv', export_analytics_csv, name='export-analytics-csv'),
     
     # API endpoints
     path('', include(router.urls)),

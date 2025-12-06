@@ -24,6 +24,11 @@ const LoginPage = lazy(() => import('./pages/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const UserProfilePage = lazy(() => import('./pages/UserProfilePage'));
 const UploadScanPage = lazy(() => import('./pages/UploadScanPage'));
+const AnalysisDashboardPage = lazy(() => import('./pages/AnalysisDashboardPage'));
+const BIDSDatasetsPage = lazy(() => import('./pages/BIDSDatasetsPage'));
+const BIDSDatasetForm = lazy(() => import('./pages/BIDSDatasetForm'));
+const BIDSDatasetDetailPage = lazy(() => import('./pages/BIDSDatasetDetailPage'));
+const DocsAssistantPage = lazy(() => import('./pages/DocsAssistantPage'));
 
 function App() {
   return (
@@ -83,6 +88,31 @@ function App() {
               <Route path="/upload" element={
                 <ProtectedRoute>
                   <UploadScanPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/analysis" element={
+                <ProtectedRoute>
+                  <AnalysisDashboardPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/bids-datasets" element={
+                <ProtectedRoute>
+                  <BIDSDatasetsPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/bids-datasets/:id" element={
+                <ProtectedRoute>
+                  <BIDSDatasetDetailPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/bids-datasets/new" element={
+                <ProtectedRoute>
+                  <BIDSDatasetForm />
+                </ProtectedRoute>
+              } />
+              <Route path="/docs-assistant" element={
+                <ProtectedRoute>
+                  <DocsAssistantPage />
                 </ProtectedRoute>
               } />
 

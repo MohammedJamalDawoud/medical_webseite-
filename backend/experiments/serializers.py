@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Organoid, MRIScan, PipelineRun, SegmentationResult, Metric, ExperimentConfig, ModelVersion
+from .models import Organoid, MRIScan, PipelineRun, SegmentationResult, Metric, ExperimentConfig, ModelVersion, BIDSDataset
 
 
 class ExperimentConfigSerializer(serializers.ModelSerializer):
@@ -122,3 +122,16 @@ class SegmentationResultSerializer(serializers.ModelSerializer):
             'organoid_name': obj.pipeline_run.mri_scan.organoid.name,
             'sequence_type': obj.pipeline_run.mri_scan.sequence_type
         }
+
+
+class BIDSDatasetSerializer(serializers.ModelSerializer):
+    """Serializer for BIDSDataset model."""
+    
+    class Meta:
+        model = BIDSDataset
+        fields = [
+            'id', 'name', 'root_path', 'description', 'bids_version',
+            'last_validated_at', 'last_validation_status', 'last_validation_summary',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at', 'last_validated_at', 'last_validation_status', 'last_validation_summary']

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import { useToast } from '../context/ToastContext';
 
 interface User {
@@ -47,11 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         try {
-            const response = await axios.get('http://localhost:8000/api/auth/me/', {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const response = await api.get('/auth/me/');
             setUser(response.data);
         } catch (error) {
             // Token is invalid or expired
@@ -64,19 +60,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     const login = async (username: string, password: string) => {
-        const response = await axios.post('http://localhost:8000/api/auth/login/', {
-            username,
-            password,
-        });
+        try {
+            const response = await api.post('/auth/login/', {
+                username,
+                password,
+            });
 
-        localStorage.setItem('access_token', response.data.access);
-        localStorage.setItem('refresh_token', response.data.refresh);
+            localStorage.setItem('access_token', response.data.access);
+            localStorage.setItem('refresh_token', response.data.refresh);
 
-        // Set axios default header
-        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
+            // Set axios default header (optional as api instance handles it via interceptor)
+            api.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
 
-        await checkAuth();
-        showToast('Welcome back! You have successfully logged in.', 'success');
+            await checkAuth();
+            showToast('Welcome back! You have successfully logged in.', 'success');
+        } catch (error: any) {
+            console.error('Login error:', error);
+            throw error;
+        }
     };
 
     const logout = async () => {
@@ -84,37 +85,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         try {
             if (refresh) {
-                await axios.post('http://localhost:8000/api/auth/logout/',
-                    { refresh },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-                        },
-                    }
-                );
+                await api.post('/auth/logout/', { refresh });
             }
         } catch (error) {
             console.error('Logout error:', error);
         } finally {
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
-            delete axios.defaults.headers.common['Authorization'];
+            delete api.defaults.headers.common['Authorization'];
             setUser(null);
             showToast('You have been logged out successfully.', 'info');
         }
     };
 
     const register = async (data: RegisterData) => {
-        const response = await axios.post('http://localhost:8000/api/auth/register/', data);
+        try {
+            const response = await api.post('/auth/register/', data);
 
-        localStorage.setItem('access_token', response.data.access);
-        localStorage.setItem('refresh_token', response.data.refresh);
+            localStorage.setItem('access_token', response.data.access);
+            localStorage.setItem('refresh_token', response.data.refresh);
 
-        // Set axios default header
-        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
+            api.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
 
-        await checkAuth();
-        showToast(`Welcome ${data.username}! Your account has been created successfully.`, 'success');
+            await checkAuth();
+            showToast(`Welcome ${data.username}! Your account has been created successfully.`, 'success');
+        } catch (error: any) {
+            console.error('Registration error:', error);
+            throw error;
+        }
     };
 
     return (

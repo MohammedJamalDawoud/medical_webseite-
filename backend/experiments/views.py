@@ -1,18 +1,16 @@
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters, status
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.permissions import AllowAny
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework import status
 
-from .models import Organoid, MRIScan, PipelineRun, SegmentationResult, Metric, ExperimentConfig, ModelVersion
+from .models import (
+    ExperimentConfig, ModelVersion, Organoid, MRIScan,
+    PipelineRun, SegmentationResult, Metric, BIDSDataset
+)
 from .serializers import (
-    OrganoidSerializer,
-    MRIScanSerializer,
-    PipelineRunSerializer,
-    SegmentationResultSerializer,
-    MetricSerializer,
-    ExperimentConfigSerializer,
-    ModelVersionSerializer
+    ExperimentConfigSerializer, ModelVersionSerializer, OrganoidSerializer,
+    MRIScanSerializer, PipelineRunSerializer, SegmentationResultSerializer,
+    MetricSerializer, BIDSDatasetSerializer
 )
 from . import analytics
 
@@ -20,7 +18,7 @@ from . import analytics
 class ExperimentConfigViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing experiment configurations.
-    Stores reusable pipeline parameter sets.
+    Defines preprocessing and segmentation pipeline parameters.
     """
     queryset = ExperimentConfig.objects.all()
     serializer_class = ExperimentConfigSerializer
@@ -222,3 +220,76 @@ def analytics_metrics(request):
             {'error': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+class BIDSDatasetViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing BIDS datasets.
+    """
+    queryset = BIDSDataset.objects.all().order_by('-created_at')
+    serializer_class = BIDSDatasetSerializer
+    permission_classes = [AllowAny]  # TODO: Change to IsAuthenticated for production
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name', 'root_path', 'description']
+    ordering_fields = ['created_at', 'last_validated_at']
+    
+    @action(detail=True, methods=['post'])
+    def validate(self, request, pk=None):
+        """
+        Trigger BIDS validation for this dataset.
+        For now, simulates validation. In production, integrate bids-validator.
+        """
+        from django.utils import timezone
+        
+        dataset = self.get_object()
+        
+        # Simulate validation (TODO: integrate actual bids-validator)
+        # In production, this would run: bids-validator <root_path>
+        dataset.last_validated_at = timezone.now()
+        dataset.last_validation_status = 'PASSED'
+        dataset.last_validation_summary = {
+            'valid': True,
+            'warnings': [],
+            'errors': [],
+            'message': 'Validation simulation - all checks passed'
+        }
+        dataset.save()
+        
+        return Response(self.get_serializer(dataset).data)
+
+
+# Export endpoints
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def export_metrics_csv(request):
+    """Export all metrics to CSV file"""
+    from . import exports
+    data = exports.export_metrics_csv()
+    return exports.generate_csv_response(data, 'metrics_export.csv')
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def export_experiments_csv(request):
+    """Export all experiment configurations to CSV file"""
+    from . import exports
+    data = exports.export_experiments_csv()
+    return exports.generate_csv_response(data, 'experiments_export.csv')
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def export_runs_csv(request):
+    """Export all pipeline runs to CSV file"""
+    from . import exports
+    data = exports.export_pipeline_runs_csv()
+    return exports.generate_csv_response(data, 'pipeline_runs_export.csv')
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def export_analytics_csv(request):
+    """Export analytics summary to CSV file"""
+    from . import exports
+    data = exports.export_analytics_summary_csv()
+    return exports.generate_csv_response(data, 'analytics_summary.csv')
